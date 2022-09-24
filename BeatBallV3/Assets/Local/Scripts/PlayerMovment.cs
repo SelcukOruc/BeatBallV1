@@ -202,7 +202,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
             animator.SetBool("isrun", true);
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            hips.AddForce(moveDir.normalized * MoveSpeed * Time.deltaTime);
+
+            hips.AddForce(move(moveDir));
+            
             hips.velocity = new Vector3(0, hips.velocity.y, 0);
 
         }
@@ -219,7 +221,19 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     }
 
-   
+    Vector3 move(Vector3 _movedir)
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            _movedir = _movedir.normalized * MoveSpeed * 2 * Time.deltaTime;
+        }
+        else
+        {
+            _movedir = _movedir.normalized * MoveSpeed * Time.deltaTime;
+        }
+       
+        return _movedir;
+    }
     
     
     public void Jump()
@@ -279,10 +293,20 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                     _balljoint.breakForce = 0;
                     _balljoint.breakTorque = 0;
                     _balljoint.connectedBody = null;
-                }
 
-                _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce, ForceMode.Impulse);
-                Debug.Log("Vurduk Paþam. " + _hitSphere[i].name);
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce, ForceMode.Impulse);
+                    Debug.Log("Vurduk Paþam. " + _hitSphere[i].name);
+
+               
+                }
+                
+                
+                if(_hitSphere[i].tag == "Player")
+                {
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce*15, ForceMode.Impulse);
+                    Debug.Log("Vurduk Paþam. " + _hitSphere[i].name);
+                }
+               
                
 
                 // Will be excecuted in a better way when switched to online.
