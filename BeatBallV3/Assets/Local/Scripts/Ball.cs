@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-public class Ball : MonoBehaviour
+using Photon.Realtime;
+
+public class Ball : MonoBehaviourPunCallbacks
 {
     [SerializeField] private PhotonView view;
     [SerializeField] private PhotonInGameController gameController;
@@ -36,7 +38,7 @@ public class Ball : MonoBehaviour
 
 
 
-
+ 
 
 
 
@@ -71,6 +73,10 @@ public class Ball : MonoBehaviour
 
     public void RevertBallPos()
     {
+        if(TryGetComponent<SpringJoint>(out SpringJoint _joint))
+        {
+            _joint.connectedBody = null;
+        }
         transform.position = new Vector3(0, 6, 3);
     }
 

@@ -36,8 +36,13 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
     [PunRPC]
     public void FindPlayersInRoom()
     {
+
+
+        Players.Clear();
+
         foreach (var player in PhotonNetwork.PlayerList)
         {
+          
 
             GameObject _playerFound = GameObject.Find(player.NickName);
             Players.Add(_playerFound);
@@ -48,6 +53,7 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
 
     }
 
+   
 
 
     [PunRPC]
@@ -78,7 +84,7 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
         HasGameBegun = true; Debug.Log("GameBegun!");
 
         if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.Instantiate(ball.name, new Vector3(0, 6, 3), Quaternion.identity);
+            PhotonNetwork.InstantiateRoomObject(ball.name, new Vector3(0, 6, 3), Quaternion.identity);
     }
 
     #endregion

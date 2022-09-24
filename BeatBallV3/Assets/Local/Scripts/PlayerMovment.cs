@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-public class PlayerMovment : MonoBehaviour
+using Photon.Realtime;
+
+public class PlayerMovment : MonoBehaviourPunCallbacks
 {
     // Variables related to 'Animation and Physics'.
 
@@ -283,4 +285,11 @@ public class PlayerMovment : MonoBehaviour
         playerParent.transform.position = Vector3.zero;
     }
 
+   
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        base.OnPlayerLeftRoom(otherPlayer);
+        gameController.GetComponent<PhotonView>().RPC("FindPlayersInRoom", RpcTarget.All);
+    }
 }
