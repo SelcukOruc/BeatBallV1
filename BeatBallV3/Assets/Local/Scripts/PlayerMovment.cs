@@ -107,7 +107,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [PunRPC]
     public void TeleportToFieldYellow()
     {
-        transform.position = fieldTeleportPointYellow.transform.position;
+        FindPos(playerParent, fieldTeleportPointYellow.transform);
         foreach (GameObject limb in Limbs)
         {
             limb.GetComponent<MeshRenderer>().material = YellowTeamMat;
@@ -118,7 +118,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [PunRPC]
     public void TeleportToFieldRed()
     {
-        transform.position = fieldTeleportPointRed.transform.position;
+        FindPos(playerParent, fieldTeleportPointRed.transform);
+
         foreach (GameObject limb in Limbs)
         {
             limb.GetComponent<MeshRenderer>().material = RedTeamMat;
@@ -134,10 +135,18 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [PunRPC]
     public void OnYellowScoredP()
     {
-        if(playerStat.IsPlayerInYellowTeam)
-          playerParent.position= fieldTeleportPointYellow.transform.position;
+        if (playerStat.IsPlayerInYellowTeam)
+        {
+            
+            FindPos(playerParent, fieldTeleportPointYellow.transform);
+        }
         else
-            playerParent.position = fieldTeleportPointRed.transform.position;
+        {
+          
+            FindPos(playerParent, fieldTeleportPointRed.transform);
+        }
+     
+           
 
 
     }
@@ -145,12 +154,28 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     public void OnRedScoredP()
     {
         if (!playerStat.IsPlayerInYellowTeam)
-            playerParent.position = fieldTeleportPointRed.transform.position;
+        {
+            
+            FindPos(playerParent, fieldTeleportPointRed.transform);
+        }
         else
-            playerParent.position = fieldTeleportPointYellow.transform.position;
+        {
+            
+            FindPos(playerParent, fieldTeleportPointYellow.transform);
+        }   
+     
+          
 
 
     }
+    Transform FindPos(Transform _myPos,Transform _targetPos)
+    {
+        _myPos.position = _targetPos.position;
+        _myPos.rotation = _targetPos.rotation;
+        
+        return _myPos;
+    }
+
 
     #endregion
 
@@ -247,7 +272,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
            
             if (_hitSphere[i].GetComponent<Rigidbody>() != null)
             {
-                if (_hitSphere[i].tag == "Ball")
+                if (_hitSphere[i].tag == "Ball" && _hitSphere[i].GetComponent<SpringJoint>() != null)
                 {
                     SpringJoint _balljoint = _hitSphere[i].GetComponent<SpringJoint>();
                     _balljoint.spring = 0;
