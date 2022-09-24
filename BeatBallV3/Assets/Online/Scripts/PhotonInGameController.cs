@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using UnityEngine.UI;
-using Photon.Realtime;
 using TMPro;
+
+
 public class PhotonInGameController : MonoBehaviourPunCallbacks
 {
     public List<GameObject> Players = new List<GameObject>();

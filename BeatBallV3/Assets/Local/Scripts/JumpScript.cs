@@ -8,42 +8,81 @@ public class JumpScript : MonoBehaviour
     [SerializeField] private PlayerStat playerStat;
     [SerializeField] private PhotonView view;
     [SerializeField] private Transform hips;
+
+    // 24.09.2022 Jump logic is only a place holder for the time being.
+
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (collision.gameObject.tag == "Ground")
+    //        IsGrounded = true;
+
+    //    if (view.IsMine)
+    //    {
+    //        if (collision.gameObject.tag == "RedTeamArea")
+    //        {
+    //            view.RPC("TeamRed", RpcTarget.All);  // IS RPC NECESSARY HERE? , I WILL TRY ANOTHER. (22.09.2022)
+
+    //        }
+
+    //        if (collision.gameObject.tag == "YellowTeamArea")
+    //        {
+    //            view.RPC("TeamYellow", RpcTarget.All);
+
+    //        }
+    //        if (collision.gameObject.tag == "DeathPanel")
+    //        {
+    //            hips.position = Vector3.zero;
+    //        }
+
+
+    //    }
+
+
+    //}
+
+    //private void OnCollisionExit(Collision collision)
+    //{
+    //    if (collision.gameObject.tag == "Ground")
+    //        IsGrounded = false;
+
+    //}
    
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.tag == "Ground")
+        if (other.gameObject.tag == "Ground")
             IsGrounded = true;
 
         if (view.IsMine)
         {
-            if (collision.gameObject.tag == "RedTeamArea")
+            if (other.gameObject.tag == "RedTeamArea")
             {
                 view.RPC("TeamRed", RpcTarget.All);  // IS RPC NECESSARY HERE? , I WILL TRY ANOTHER. (22.09.2022)
 
             }
 
-            if (collision.gameObject.tag == "YellowTeamArea")
+            if (other.gameObject.tag == "YellowTeamArea")
             {
                 view.RPC("TeamYellow", RpcTarget.All);
 
             }
-            if (collision.gameObject.tag == "DeathPanel")
+            if (other.gameObject.tag == "DeathPanel")
             {
                 hips.position = Vector3.zero;
             }
-            
-        
+
+
         }
-       
-       
     }
 
-    private void OnCollisionExit(Collision collision)
+
+    private void OnTriggerExit(Collider other)
     {
-        if (collision.gameObject.tag == "Ground")
+        if (other.gameObject.tag == "Ground")
             IsGrounded = false;
-
     }
+
+
+
 
 
 

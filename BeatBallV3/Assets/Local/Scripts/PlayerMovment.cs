@@ -233,7 +233,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         {
             _movedir = _movedir.normalized * MoveSpeed * 2.4f * Time.deltaTime;
             playerStat.Stamina -= 2;
-            Debug.Log("Running");
+            
         }
         else
         {
@@ -250,7 +250,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         {
             timeMine = 0;
             playerStat.Stamina += 1;
-            //Debug.Log("Stamina Filled" + playerStat.Stamina);
+         
         
         }
     
@@ -317,7 +317,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                     _balljoint.connectedBody = null;
 
                     _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce, ForceMode.Impulse);
-                    Debug.Log("Vurduk Paþam. " + _hitSphere[i].name);
+                   
 
                
                 }
@@ -326,7 +326,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                 if(_hitSphere[i].tag == "Player")
                 {
                     _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce*15, ForceMode.Impulse);
-                    Debug.Log("Vurduk Paþam. " + _hitSphere[i].name);
+                   
                 }
                
                
