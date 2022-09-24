@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class BallController : MonoBehaviour
+using Photon.Pun;
+public class BallController : MonoBehaviourPun
 {
     [SerializeField] private Rigidbody hipsRigid;
 
@@ -11,6 +11,9 @@ public class BallController : MonoBehaviour
         if (other.gameObject.tag == "Ball")
         {
             Debug.Log("BALL ON ME");
+            PhotonView _ballPhotonView = other.gameObject.GetComponent<PhotonView>();
+            _ballPhotonView.RequestOwnership();
+            
             if (other.gameObject.TryGetComponent<SpringJoint>(out SpringJoint _joint))
             {
                 Debug.Log("Joint exists.");
@@ -30,6 +33,7 @@ public class BallController : MonoBehaviour
             else
             {
                 Debug.Log("Placed.");
+               
                 _joint = other.gameObject.AddComponent<SpringJoint>();
                 _joint.connectedBody = hipsRigid;
                 _joint.autoConfigureConnectedAnchor = false;
@@ -37,7 +41,12 @@ public class BallController : MonoBehaviour
                 _joint.spring = 900;
             }
         
+
         }
+    
+    
+    
+    
     }
    
 
