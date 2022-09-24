@@ -221,23 +221,24 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             animator.SetBool("isrun", false);
            
             hips.velocity = new Vector3(0, hips.velocity.y, 0);
-
+            FillStamina();
         }
 
-        FillStamina();
+      
     }
 
     Vector3 move(Vector3 _movedir)
     {
         if (Input.GetKey(KeyCode.LeftShift) && playerStat.Stamina > 0)
         {
-            _movedir = _movedir.normalized * MoveSpeed * 3 * Time.deltaTime;
-            playerStat.Stamina--;
+            _movedir = _movedir.normalized * MoveSpeed * 2.4f * Time.deltaTime;
+            playerStat.Stamina -= 2;
+            Debug.Log("Running");
         }
         else
         {
             _movedir = _movedir.normalized * MoveSpeed * Time.deltaTime;
-          
+            FillStamina();
         }
        
         return _movedir;
@@ -245,11 +246,11 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     void FillStamina()
     {
-        if (timeMine > 0.3f && playerStat.Stamina < 100)
+        if (timeMine > 0.15f && playerStat.Stamina < 100)
         {
             timeMine = 0;
-            playerStat.Stamina++;
-            Debug.Log("Stamina Filled" + playerStat.Stamina);
+            playerStat.Stamina += 1;
+            //Debug.Log("Stamina Filled" + playerStat.Stamina);
         
         }
     
@@ -349,11 +350,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     
     #endregion
    
-    [PunRPC]
-    public void OnFallen()
-    {
-        playerParent.transform.position = Vector3.zero;
-    }
+   
 
    
 

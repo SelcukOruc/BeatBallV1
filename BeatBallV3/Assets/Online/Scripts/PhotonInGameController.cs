@@ -20,9 +20,12 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
     {
         view = GetComponent<PhotonView>();
 
+        
         GameObject _player=  PhotonNetwork.Instantiate(PlayerPrefab.name, SpawnPos.position, Quaternion.identity);
+        // Finding Childs with index is not recommended and not efficient, i will change this approach when i revise project. 24/09/2022.
         _player.transform.GetChild(0).gameObject.SetActive(true);
         _player.transform.GetChild(1).gameObject.SetActive(true);
+        _player.transform.GetChild(2).gameObject.SetActive(true);
        
         
      
@@ -46,7 +49,7 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
 
             GameObject _playerFound = GameObject.Find(player.NickName);
             Players.Add(_playerFound);
-            Debug.LogError(_playerFound);
+           
 
         }
 

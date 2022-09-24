@@ -7,7 +7,7 @@ public class JumpScript : MonoBehaviour
     public bool IsGrounded;
     [SerializeField] private PlayerStat playerStat;
     [SerializeField] private PhotonView view;
-   
+    [SerializeField] private Transform hips;
    
     private void OnCollisionEnter(Collision collision)
     {
@@ -29,7 +29,7 @@ public class JumpScript : MonoBehaviour
             }
             if (collision.gameObject.tag == "DeathPanel")
             {
-                view.RPC("OnFallen", RpcTarget.All);
+                hips.position = Vector3.zero;
             }
             
         
