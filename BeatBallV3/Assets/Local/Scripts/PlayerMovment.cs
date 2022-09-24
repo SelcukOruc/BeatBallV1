@@ -49,6 +49,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     [SerializeField] private Transform playerParent;
 
+    Vector3 direction;
+    float timeMine;
+
     private void Start()
     {
         view = GetComponent<PhotonView>();
@@ -61,6 +64,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
        
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+      
     }
 
     void FixedUpdate()
@@ -83,14 +88,15 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
         if (view.IsMine)
         {
-            
+            timeMine += Time.deltaTime;
+           
             Jump();
             Hit();
 
             if (PhotonNetwork.IsMasterClient && Input.GetKeyDown(KeyCode.X) && !gameController.HasGameBegun)
                 gameController.StartTheGame();
 
-
+          
         }
 
 
@@ -186,7 +192,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
+        direction = new Vector3(horizontal, 0, vertical).normalized;
 
 
        
@@ -213,29 +219,44 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         {
 
             animator.SetBool("isrun", false);
+           
             hips.velocity = new Vector3(0, hips.velocity.y, 0);
 
         }
 
-
-
+        FillStamina();
     }
 
     Vector3 move(Vector3 _movedir)
     {
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) && playerStat.Stamina > 0)
         {
-            _movedir = _movedir.normalized * MoveSpeed * 2 * Time.deltaTime;
+            _movedir = _movedir.normalized * MoveSpeed * 3 * Time.deltaTime;
+            playerStat.Stamina--;
         }
         else
         {
             _movedir = _movedir.normalized * MoveSpeed * Time.deltaTime;
+          
         }
        
         return _movedir;
     }
+
+    void FillStamina()
+    {
+        if (timeMine > 0.3f && playerStat.Stamina < 100)
+        {
+            timeMine = 0;
+            playerStat.Stamina++;
+            Debug.Log("Stamina Filled" + playerStat.Stamina);
+        
+        }
     
     
+    }
+
+
     public void Jump()
     {
         if (Input.GetKeyDown(KeyCode.Space))
