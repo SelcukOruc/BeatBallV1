@@ -22,10 +22,10 @@ public class Ball : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             if (collision.gameObject.tag == "YellowInside")
-                view.RPC("OnRedScored", RpcTarget.All);
+                view.RPC("RPC_OnRedScored_Ball", RpcTarget.All);
            
             if (collision.gameObject.tag == "RedInside")
-                view.RPC("OnYellowScored", RpcTarget.All);
+                view.RPC("RPC_OnYellowScored_Ball", RpcTarget.All);
 
         }
 
@@ -35,16 +35,8 @@ public class Ball : MonoBehaviourPunCallbacks
 
 
 
-
-
-
- 
-
-
-
-
     [PunRPC]
-    public void OnRedScored()
+    public void RPC_OnRedScored_Ball()
     {
         RevertBallPos();
         gameStat.RedScore++;
@@ -52,14 +44,14 @@ public class Ball : MonoBehaviourPunCallbacks
 
         foreach (var player in gameController.Players)
         {
-           
-            player.GetComponent<PlayerMovment>().OnRedScoredP();
+
+            player.GetComponent<PlayerMovment>().OnRedScoredP_Player();
         }
 
     }
-    
+
     [PunRPC]
-    public void OnYellowScored()
+    public void RPC_OnYellowScored_Ball()
     {
         RevertBallPos();
         gameStat.YellowScore++;
@@ -67,28 +59,37 @@ public class Ball : MonoBehaviourPunCallbacks
 
         foreach (var player in gameController.Players)
         {
-            
-            player.GetComponent<PlayerMovment>().OnYellowScoredP();
+
+            player.GetComponent<PlayerMovment>().OnYellowScored_Player();
         }
 
     }
 
+
     public void RevertBallPos()
     {
-        if(TryGetComponent<SpringJoint>(out SpringJoint _joint))
+        if (TryGetComponent<SpringJoint>(out SpringJoint _joint))
         {
             _joint.connectedBody = null;
         }
         transform.position = new Vector3(0, 6, 3);
     }
 
-   
-
-
-
-
-
-
-
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

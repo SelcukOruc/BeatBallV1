@@ -110,8 +110,12 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
 
     #region Game Begun
+    // RPC must stay because we sync not only transforms but also materials.
+    // These Methods Only used at the begining of The game.
+    // Therefore, players inital preferences that will last till the game ends can be written inside of these methods
+    
     [PunRPC]
-    public void TeleportToFieldYellow()
+    public void Initial_TeleportToFieldYellow()
     {
         FindPos(playerParent, fieldTeleportPointYellow.transform);
         foreach (GameObject limb in Limbs)
@@ -121,8 +125,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         }
 
     }
+   
     [PunRPC]
-    public void TeleportToFieldRed()
+    public void Initial_TeleportToFieldRed()
     {
         FindPos(playerParent, fieldTeleportPointRed.transform);
 
@@ -136,10 +141,12 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     }
     #endregion
 
+    
+    
     #region Teams Scored
    
-    //[PunRPC]
-    public void OnYellowScoredP()
+    
+    public void OnYellowScored_Player()
     {
         if (playerStat.IsPlayerInYellowTeam)
         {
@@ -156,8 +163,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
 
     }
-    //[PunRPC]
-    public void OnRedScoredP()
+    
+    public void OnRedScoredP_Player()
     {
         if (!playerStat.IsPlayerInYellowTeam)
         {
@@ -174,6 +181,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
 
     }
+   
     Transform FindPos(Transform _myPos,Transform _targetPos)
     {
         _myPos.position = _targetPos.position;
@@ -185,6 +193,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     #endregion
 
+   
+    
     #region physics
     public void Move()
     {
@@ -361,4 +371,6 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         base.OnPlayerLeftRoom(otherPlayer);
         gameController.GetComponent<PhotonView>().RPC("FindPlayersInRoom", RpcTarget.All);
     }
+
+
 }

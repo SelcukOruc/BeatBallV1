@@ -31,11 +31,22 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
      
     }
 
-   
+
 
 
     #region StartTheGame
-   
+    /// <summary>
+        // Sequence IS...
+             // Find players in the room,
+                // Move them to their places,
+                     // Start the game.[This method called inside PlayerMovment,when Master presses down 'X']
+                        // (inside this method set game as begun)
+    /// </summary>
+
+
+
+    // I use this method when game beguns and when a player leaves the room.
+    // When sth is meant to be applied to all players i intend to find players via this method.
     [PunRPC]
     public void FindPlayersInRoom()
     {
@@ -65,9 +76,9 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
         for (int i = 0; i < Players.Count; i++)
         {
             if (Players[i].GetComponent<PlayerStat>().IsPlayerInYellowTeam)
-                Players[i].GetComponent<PhotonView>().RPC("TeleportToFieldYellow", RpcTarget.All);
+                Players[i].GetComponent<PhotonView>().RPC("Initial_TeleportToFieldYellow", RpcTarget.All); // This Rpc is in PlayerMovmentScript.
             else
-                Players[i].GetComponent<PhotonView>().RPC("TeleportToFieldRed", RpcTarget.All);
+                Players[i].GetComponent<PhotonView>().RPC("Initial_TeleportToFieldRed", RpcTarget.All);
 
         }
     }
@@ -84,7 +95,7 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
     [PunRPC]
     void GameBegun()
     {
-        HasGameBegun = true; Debug.Log("GameBegun!");
+        HasGameBegun = true; 
 
         if (PhotonNetwork.IsMasterClient)
             PhotonNetwork.InstantiateRoomObject(ball.name, new Vector3(0, 6, 3), Quaternion.identity);

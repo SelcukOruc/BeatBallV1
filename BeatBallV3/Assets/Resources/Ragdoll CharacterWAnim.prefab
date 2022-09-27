@@ -1676,7 +1676,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsGrounded: 0
   playerStat: {fileID: 3897999112946360424}
-  view: {fileID: 5798488962252505949}
+  Main_view: {fileID: 5798488962252505949}
   hips: {fileID: 6578474812732972780}
 --- !u!1 &3196255047770234371
 GameObject:
@@ -4745,7 +4745,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsGrounded: 0
   playerStat: {fileID: 3897999112946360424}
-  view: {fileID: 5798488962252505949}
+  Main_view: {fileID: 5798488962252505949}
   hips: {fileID: 6578474812732972780}
 --- !u!65 &1552502079602718534
 BoxCollider:

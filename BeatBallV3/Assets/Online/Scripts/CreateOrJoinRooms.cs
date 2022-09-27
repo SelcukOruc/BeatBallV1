@@ -4,6 +4,8 @@ using UnityEngine;
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+
 public class CreateOrJoinRooms : MonoBehaviourPunCallbacks
 {
     RoomOptions options = new RoomOptions();
@@ -15,6 +17,9 @@ public class CreateOrJoinRooms : MonoBehaviourPunCallbacks
     {
 
         options.MaxPlayers = 4;
+
+       
+       
         PhotonNetwork.LocalPlayer.NickName = NickNameInputField.text;
         PhotonNetwork.JoinOrCreateRoom(RoomNameInputField.text, options, TypedLobby.Default);
 
