@@ -52,7 +52,8 @@ public class Ball : MonoBehaviourPunCallbacks
 
         foreach (var player in gameController.Players)
         {
-            player.GetComponent<PhotonView>().RPC("OnRedScoredP", RpcTarget.All);
+           
+            player.GetComponent<PlayerMovment>().OnRedScoredP();
         }
 
     }
@@ -66,7 +67,8 @@ public class Ball : MonoBehaviourPunCallbacks
 
         foreach (var player in gameController.Players)
         {
-            player.GetComponent<PhotonView>().RPC("OnYellowScoredP", RpcTarget.All);
+            
+            player.GetComponent<PlayerMovment>().OnYellowScoredP();
         }
 
     }

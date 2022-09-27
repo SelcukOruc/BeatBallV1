@@ -138,7 +138,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     #region Teams Scored
    
-    [PunRPC]
+    //[PunRPC]
     public void OnYellowScoredP()
     {
         if (playerStat.IsPlayerInYellowTeam)
@@ -156,7 +156,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
 
     }
-    [PunRPC]
+    //[PunRPC]
     public void OnRedScoredP()
     {
         if (!playerStat.IsPlayerInYellowTeam)
@@ -325,7 +325,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                 
                 if(_hitSphere[i].tag == "Player")
                 {
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce*15, ForceMode.Impulse);
+                   
+
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce*30, ForceMode.Impulse);
                    
                 }
                
