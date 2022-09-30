@@ -10,6 +10,7 @@ public class PlayerStat : MonoBehaviour
     public bool IsPlayerInYellowTeam;
     [SerializeField] private TextMeshProUGUI nickNameText;
 
+    // Stamina
     [SerializeField] private Image staminaBar;
     float staminaStartValue;
     private float stamina = 99;
@@ -32,7 +33,25 @@ public class PlayerStat : MonoBehaviour
             return stamina;
         }
     }
-
+    // HitForce
+    [SerializeField] private Image hitForceBar;
+    private float hitForce;
+    float hitForceStartValue; // Maximum force reachable.
+    public float HitForceLimit;
+    public float HitForce
+    {
+        get
+        {
+            return hitForce;
+        }
+        set
+        {
+            hitForce = value;
+            hitForceBar.fillAmount = hitForce / hitForceStartValue;
+       
+        }
+    
+    }
 
     private void Awake()
     {
@@ -40,7 +59,9 @@ public class PlayerStat : MonoBehaviour
         view.RPC("UpdateName", RpcTarget.All);
         
         staminaStartValue = stamina;
-    
+        hitForceStartValue = HitForceLimit;
+
+
     }
 
     [PunRPC]
@@ -50,7 +71,7 @@ public class PlayerStat : MonoBehaviour
         nickNameText.text = view.Controller.NickName;
     }
 
-
+    // Methods for team selection in the begining.
     [PunRPC]
     public void TeamYellow()
     {

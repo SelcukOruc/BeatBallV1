@@ -22,10 +22,10 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [SerializeField] private float jumpForce;
 
     // Variables related to 'Hit'.
-    float timer;
+   
     [Range(0, 20)]
     [SerializeField] private float HitForce = 9;
-    [SerializeField] private float hitDelay;
+   
     [SerializeField] private float hitRadius;
 
     [SerializeField] private Transform hitPoint;
@@ -50,8 +50,11 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [SerializeField] private Transform playerParent;
 
     Vector3 direction;
-    float timeMine;
+   
+    float staminaTimer;
 
+
+    bool IsPressedDown = false;
     private void Start()
     {
         view = GetComponent<PhotonView>();
@@ -60,8 +63,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
        
         fieldTeleportPointYellow = GameObject.Find("FieldTeleportPointYellow");
         fieldTeleportPointRed = GameObject.Find("FieldTeleportPointRed");
-        
-       
+
+        StartCoroutine(FillHitForce());
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -88,7 +92,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
         if (view.IsMine)
         {
-            timeMine += Time.deltaTime;
+            staminaTimer += Time.deltaTime;
            
             Jump();
             Hit();
@@ -256,9 +260,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     void FillStamina()
     {
-        if (timeMine > 0.15f && playerStat.Stamina < 100)
+        if (staminaTimer > 0.15f && playerStat.Stamina < 100)
         {
-            timeMine = 0;
+            staminaTimer = 0;
             playerStat.Stamina += 1;
          
         
@@ -287,26 +291,52 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     public void Hit()
     {
-        timer += Time.deltaTime;
+      
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonUp(0))
         {
-            if (timer >= hitDelay)
-            {
-                // make anim work.
-                timer = 0;
-                animator.SetTrigger("hit");
 
 
-                // Apply force to the target object.
-                if(view.IsMine)
-                view.RPC("ApplyForceToTarget",RpcTarget.All);
+            // make anim work.
+            animator.SetTrigger("hit");
 
-            }
 
+
+            // Apply force to the target object.
+            view.RPC("ApplyForceToTarget", RpcTarget.All);
+
+
+            IsPressedDown = false;
+            playerStat.HitForce = 0;
 
         }
 
+
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            IsPressedDown = true;
+        }
+    
+    
+    
+    }
+    IEnumerator FillHitForce()
+    {
+        while (true)
+        {
+            if (IsPressedDown)
+            {
+                playerStat.HitForce = Mathf.Clamp(playerStat.HitForce, 0, playerStat.HitForceLimit);
+                playerStat.HitForce += 2f;
+                Debug.Log(playerStat.HitForce);
+                yield return new WaitForSeconds(0.1f);
+            }
+           
+            yield return null;
+       
+        }
+    
     }
 
     [PunRPC]
@@ -326,7 +356,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                     _balljoint.breakTorque = 0;
                     _balljoint.connectedBody = null;
 
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce, ForceMode.Impulse);
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce, ForceMode.Impulse);
                    
 
                
@@ -337,7 +367,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                 {
                    
 
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * HitForce*30, ForceMode.Impulse);
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce*30, ForceMode.Impulse);
                    
                 }
                
