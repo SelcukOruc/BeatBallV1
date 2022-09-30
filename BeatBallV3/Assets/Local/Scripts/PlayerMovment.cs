@@ -274,6 +274,10 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     }
 
+
+    // 30.09.2022 - There appears to be a problem after implementing Hitforce,which stems from colliders,
+    // i will think and search for a better approach.
+    // Problem solved temporarily.
     public void Hit()
     {
 
@@ -330,10 +334,11 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                 if (_hitSphere[i].tag == "Ball" && _hitSphere[i].GetComponent<SpringJoint>() != null)
                 {
                     SpringJoint _balljoint = _hitSphere[i].GetComponent<SpringJoint>();
+                    _balljoint.connectedBody = null;
                     _balljoint.spring = 0;
                     _balljoint.breakForce = 0;
                     _balljoint.breakTorque = 0;
-                    _balljoint.connectedBody = null;
+                   
 
                     _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce, ForceMode.Impulse);
 
