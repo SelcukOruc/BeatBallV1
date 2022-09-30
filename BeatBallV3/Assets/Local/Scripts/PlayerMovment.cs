@@ -56,6 +56,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
 
     bool IsPressedDown = false;
+
+    Vector3 camY;
     private void Start()
     {
         view = GetComponent<PhotonView>();
@@ -94,9 +96,10 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             if (PhotonNetwork.IsMasterClient && Input.GetKeyDown(KeyCode.X) && !gameController.HasGameBegun)
                 gameController.StartTheGame();
 
-
+            camY = new Vector3(0, mainCam.transform.localPosition.y, 0);
+           
         }
-
+      
     }
 
 
@@ -309,7 +312,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             {
                 playerStat.HitForce = Mathf.Clamp(playerStat.HitForce, 0, playerStat.HitForceLimit);
                 playerStat.HitForce += 2f;
-                Debug.Log(playerStat.HitForce);
+                
                 yield return new WaitForSeconds(0.1f);
             }
 
@@ -338,9 +341,11 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                     _balljoint.spring = 0;
                     _balljoint.breakForce = 0;
                     _balljoint.breakTorque = 0;
-                   
 
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce, ForceMode.Impulse);
+                    float camY = mainCam.transform.localPosition.y;
+                    camY = Mathf.Clamp(mainCam.transform.localPosition.y, 0, 15); // inverse and balance.
+                    Debug.Log(camY);
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce( (hitPoint.forward * playerStat.HitForce) + new Vector3(0, camY , 0), ForceMode.Impulse);
 
 
 
