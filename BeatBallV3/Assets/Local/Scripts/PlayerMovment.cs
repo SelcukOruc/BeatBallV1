@@ -6,6 +6,8 @@ using Photon.Realtime;
 
 public class PlayerMovment : MonoBehaviourPunCallbacks
 {
+    // Variables will be rearranged. 30.09.2022;
+
     // Variables related to 'Animation and Physics'.
 
     [SerializeField] private Animator animator;
@@ -14,19 +16,18 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     [SerializeField] ConfigurableJoint hipscj;
 
-    public float MoveSpeed;
+    public float MoveSpeed; //-
     [SerializeField] private Camera mainCam;
     // Variables related to 'Jump'.
     [SerializeField] private JumpScript LeftFoot;
     [SerializeField] private JumpScript RightFoot;
-    [SerializeField] private float jumpForce;
+    [SerializeField] private float jumpForce; //-
 
     // Variables related to 'Hit'.
    
-    [Range(0, 20)]
-    [SerializeField] private float HitForce = 9;
+  
    
-    [SerializeField] private float hitRadius;
+    [SerializeField] private float hitRadius; //-
 
     [SerializeField] private Transform hitPoint;
     [SerializeField] LayerMask WhomToHit;
@@ -80,44 +81,30 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     }
 
-
-
-
-
-
-
     private void Update()
     {
-
 
         if (view.IsMine)
         {
             staminaTimer += Time.deltaTime;
-           
+
             Jump();
             Hit();
 
             if (PhotonNetwork.IsMasterClient && Input.GetKeyDown(KeyCode.X) && !gameController.HasGameBegun)
                 gameController.StartTheGame();
 
-          
+
         }
 
-
     }
-
-
-
-
-
-
 
 
     #region Game Begun
     // RPC must stay because we sync not only transforms but also materials.
     // These Methods Only used at the begining of The game.
     // Therefore, players inital preferences that will last till the game ends can be written inside of these methods
-    
+
     [PunRPC]
     public void Initial_TeleportToFieldYellow()
     {
@@ -129,7 +116,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         }
 
     }
-   
+
     [PunRPC]
     public void Initial_TeleportToFieldRed()
     {
@@ -145,60 +132,58 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     }
     #endregion
 
-    
-    
+
     #region Teams Scored
-   
-    
+
+
     public void OnYellowScored_Player()
     {
         if (playerStat.IsPlayerInYellowTeam)
         {
-            
+
             FindPos(playerParent, fieldTeleportPointYellow.transform);
         }
         else
         {
-          
+
             FindPos(playerParent, fieldTeleportPointRed.transform);
         }
-     
-           
+
+
 
 
     }
-    
+
     public void OnRedScoredP_Player()
     {
         if (!playerStat.IsPlayerInYellowTeam)
         {
-            
+
             FindPos(playerParent, fieldTeleportPointRed.transform);
         }
         else
         {
-            
+
             FindPos(playerParent, fieldTeleportPointYellow.transform);
-        }   
-     
-          
+        }
+
+
 
 
     }
-   
-    Transform FindPos(Transform _myPos,Transform _targetPos)
+
+    Transform FindPos(Transform _myPos, Transform _targetPos)
     {
         _myPos.position = _targetPos.position;
         _myPos.rotation = _targetPos.rotation;
-        
+
         return _myPos;
     }
 
 
     #endregion
 
-   
-    
+
     #region physics
     public void Move()
     {
@@ -209,36 +194,36 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         direction = new Vector3(horizontal, 0, vertical).normalized;
 
 
-       
 
 
+        // On Move
         if (direction.magnitude >= 0.1f)
         {
 
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + mainCam.transform.eulerAngles.y;
 
-          
+
             hipscj.targetRotation = Quaternion.Euler(0, -targetAngle, 0);
 
             animator.SetBool("isrun", true);
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
 
             hips.AddForce(move(moveDir));
-            
+
             hips.velocity = new Vector3(0, hips.velocity.y, 0);
 
         }
-        //set animation to idle.
+        // On Idle
         else
         {
 
             animator.SetBool("isrun", false);
-           
+
             hips.velocity = new Vector3(0, hips.velocity.y, 0);
             FillStamina();
         }
 
-      
+
     }
 
     Vector3 move(Vector3 _movedir)
@@ -247,14 +232,14 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         {
             _movedir = _movedir.normalized * MoveSpeed * 2.4f * Time.deltaTime;
             playerStat.Stamina -= 2;
-            
+
         }
         else
         {
             _movedir = _movedir.normalized * MoveSpeed * Time.deltaTime;
             FillStamina();
         }
-       
+
         return _movedir;
     }
 
@@ -264,11 +249,11 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         {
             staminaTimer = 0;
             playerStat.Stamina += 1;
-         
-        
+
+
         }
-    
-    
+
+
     }
 
 
@@ -291,36 +276,27 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     public void Hit()
     {
-      
 
         if (Input.GetMouseButtonUp(0))
         {
-
-
             // make anim work.
             animator.SetTrigger("hit");
-
-
-
             // Apply force to the target object.
             view.RPC("ApplyForceToTarget", RpcTarget.All);
-
-
+            // Reset Hitforce
             IsPressedDown = false;
             playerStat.HitForce = 0;
 
         }
 
-
-
         if (Input.GetMouseButtonDown(0))
         {
             IsPressedDown = true;
         }
-    
-    
-    
+
+
     }
+
     IEnumerator FillHitForce()
     {
         while (true)
@@ -332,20 +308,23 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                 Debug.Log(playerStat.HitForce);
                 yield return new WaitForSeconds(0.1f);
             }
-           
+
             yield return null;
-       
+
         }
-    
+
     }
+
+
 
     [PunRPC]
     public void ApplyForceToTarget()
     {
+
         Collider[] _hitSphere = Physics.OverlapSphere(hitPoint.position, hitRadius, WhomToHit);
         for (int i = 0; i < _hitSphere.Length; i++)
         {
-           
+
             if (_hitSphere[i].GetComponent<Rigidbody>() != null)
             {
                 if (_hitSphere[i].tag == "Ball" && _hitSphere[i].GetComponent<SpringJoint>() != null)
@@ -357,21 +336,17 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                     _balljoint.connectedBody = null;
 
                     _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce, ForceMode.Impulse);
-                   
 
-               
+
+
                 }
-                
-                
-                if(_hitSphere[i].tag == "Player")
+
+
+                if (_hitSphere[i].tag == "Player")
                 {
-                   
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce * 30, ForceMode.Impulse);
 
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce*30, ForceMode.Impulse);
-                   
                 }
-               
-               
 
                 // Will be excecuted in a better way when switched to online.
                 Instantiate(PumVFX, _hitSphere[i].transform.position, Quaternion.identity);
@@ -379,22 +354,22 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             }
 
 
-
         }
+
+
     }
+
+
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(hitPoint.position, hitRadius);
     }
-   
-    
-    #endregion
-   
-   
 
-   
+    #endregion
+
+
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
@@ -404,3 +379,35 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -33,6 +33,7 @@ public class PlayerStat : MonoBehaviour
             return stamina;
         }
     }
+    
     // HitForce
     [SerializeField] private Image hitForceBar;
     private float hitForce;

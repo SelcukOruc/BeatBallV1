@@ -18,8 +18,8 @@ public class CopyMotion : MonoBehaviour
         else
             cj.targetRotation = Quaternion.Inverse(targetLimb.rotation);
 
-        
-
-        
     }
+
+
+
 }
