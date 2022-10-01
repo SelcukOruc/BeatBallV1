@@ -67,7 +67,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         fieldTeleportPointYellow = GameObject.Find("FieldTeleportPointYellow");
         fieldTeleportPointRed = GameObject.Find("FieldTeleportPointRed");
 
-        StartCoroutine(FillHitForce());
+        StartCoroutine(Co_FillHitForce());
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -111,7 +111,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [PunRPC]
     public void Initial_TeleportToFieldYellow()
     {
-        FindPos(playerParent, fieldTeleportPointYellow.transform);
+        playerParent.SetPositionAndRotation(fieldTeleportPointYellow.transform.position, fieldTeleportPointYellow.transform.rotation);
         foreach (GameObject limb in Limbs)
         {
             limb.GetComponent<MeshRenderer>().material = YellowTeamMat;
@@ -123,8 +123,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [PunRPC]
     public void Initial_TeleportToFieldRed()
     {
-        FindPos(playerParent, fieldTeleportPointRed.transform);
-
+        playerParent.SetPositionAndRotation(fieldTeleportPointRed.transform.position, fieldTeleportPointRed.transform.rotation);
         foreach (GameObject limb in Limbs)
         {
             limb.GetComponent<MeshRenderer>().material = RedTeamMat;
@@ -141,47 +140,44 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     public void OnYellowScored_Player()
     {
+       
         if (playerStat.IsPlayerInYellowTeam)
         {
-
-            FindPos(playerParent, fieldTeleportPointYellow.transform);
+            playerParent.SetPositionAndRotation(fieldTeleportPointYellow.transform.position, fieldTeleportPointYellow.transform.rotation);
         }
         else
         {
-
-            FindPos(playerParent, fieldTeleportPointRed.transform);
+            playerParent.SetPositionAndRotation(fieldTeleportPointRed.transform.position, fieldTeleportPointRed.transform.rotation);
         }
 
-
-
-
     }
+
+
+
+
+
 
     public void OnRedScoredP_Player()
     {
+        
         if (!playerStat.IsPlayerInYellowTeam)
         {
-
-            FindPos(playerParent, fieldTeleportPointRed.transform);
+            playerParent.SetPositionAndRotation(fieldTeleportPointRed.transform.position, fieldTeleportPointRed.transform.rotation);
         }
         else
         {
-
-            FindPos(playerParent, fieldTeleportPointYellow.transform);
+            playerParent.SetPositionAndRotation(fieldTeleportPointYellow.transform.position, fieldTeleportPointYellow.transform.rotation);
         }
 
-
-
-
     }
 
-    Transform FindPos(Transform _myPos, Transform _targetPos)
-    {
-        _myPos.position = _targetPos.position;
-        _myPos.rotation = _targetPos.rotation;
 
-        return _myPos;
-    }
+
+
+
+
+
+
 
 
     #endregion
@@ -304,7 +300,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     }
 
-    IEnumerator FillHitForce()
+    IEnumerator Co_FillHitForce()
     {
         while (true)
         {
@@ -344,6 +340,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
                     float camY = mainCam.transform.localPosition.y;
                     camY = Mathf.Clamp(mainCam.transform.localPosition.y, 0, 15); // inverse and balance.
+                    
                     Debug.Log(camY);
                     _hitSphere[i].GetComponent<Rigidbody>().AddForce( (hitPoint.forward * playerStat.HitForce) + new Vector3(0, camY , 0), ForceMode.Impulse);
 
