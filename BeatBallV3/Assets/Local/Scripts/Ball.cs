@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
-
-public class Ball : MonoBehaviourPunCallbacks
+public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
 {
     [SerializeField] private PhotonView view;
     [SerializeField] private PhotonInGameController gameController;
     [SerializeField] private GameStat gameStat;
-    public Transform player = null;
+    
 
     private void Start()
     {
@@ -75,6 +75,38 @@ public class Ball : MonoBehaviourPunCallbacks
         transform.position = new Vector3(0, 6, 3);
     }
 
+
+    private void Awake()
+    {
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+    private void OnDestroy()
+    {
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
+
+    public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
+    {
+        if (targetView != base.photonView)
+            return;
+       
+        
+        base.photonView.TransferOwnership(requestingPlayer);
+   
+    }
+
+    public void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
+    {
+        if (targetView != base.photonView)
+            return;
+    }
+
+    public void OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)
+    {
+        throw new System.NotImplementedException();
+    }
+
+   
 
 }
 

@@ -448,6 +448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hipsRigid: {fileID: 2777122734477268700}
+  playerPhotonView: {fileID: 5798488962252505949}
 --- !u!65 &3437246416543968929
 BoxCollider:
   m_ObjectHideFlags: 0
