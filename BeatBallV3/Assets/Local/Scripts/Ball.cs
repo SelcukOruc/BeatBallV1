@@ -99,6 +99,7 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     {
         if (targetView != base.photonView)
             return;
+       // here can be used rather than ball controller.
     }
 
     public void OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)

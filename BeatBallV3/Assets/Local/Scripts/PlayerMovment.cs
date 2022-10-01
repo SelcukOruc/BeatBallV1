@@ -335,12 +335,14 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                 if (_hitSphere[i].tag == "Ball" && _hitSphere[i].GetComponent<SpringJoint>() != null)
                 {
                     SpringJoint _balljoint = _hitSphere[i].GetComponent<SpringJoint>();
-                    _balljoint.connectedBody = null;
                     _balljoint.spring = 0;
                     _balljoint.breakForce = 0;
                     _balljoint.breakTorque = 0;
+                    _balljoint.connectedBody = null;
 
-                   
+
+
+
 
                     _hitSphere[i].GetComponent<Rigidbody>().AddForce( (hitPoint.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight) , 0), ForceMode.Impulse);
 
@@ -351,7 +353,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
                 if (_hitSphere[i].tag == "Player")
                 {
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce * 30, ForceMode.Impulse);
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce * 30, ForceMode.Impulse); // hit force for other players value should be locally assaigned. 1.10.2022
 
                 }
 
