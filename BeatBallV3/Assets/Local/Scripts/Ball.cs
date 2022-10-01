@@ -34,7 +34,7 @@ public class Ball : MonoBehaviourPunCallbacks
 
 
 
-
+    // Raise event seems to be better option 1.10.2022
     [PunRPC]
     public void RPC_OnRedScored_Ball()
     {

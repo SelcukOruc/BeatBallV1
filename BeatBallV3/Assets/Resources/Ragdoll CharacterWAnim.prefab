@@ -4401,21 +4401,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6564d6a85da2a4b4ca70262eb8e0ea28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCam: {fileID: 8351112925162696929}
+  playerParent: {fileID: 6578474812732972780}
   animator: {fileID: 5141363543937499457}
   hips: {fileID: 2777122734477268700}
   hipscj: {fileID: 2777122734477268701}
-  MoveSpeed: 30000
-  mainCam: {fileID: 8351112925162696929}
-  LeftFoot: {fileID: 1379965088747739979}
-  RightFoot: {fileID: 2419447664296558094}
-  jumpForce: 300000
+  leftFoot: {fileID: 1379965088747739979}
+  rightFoot: {fileID: 2419447664296558094}
   hitRadius: 1.3
   hitPoint: {fileID: 6015754586793677558}
-  WhomToHit:
+  whomToHit:
     serializedVersion: 2
     m_Bits: 392
-  PumVFX: {fileID: 5880797563127281583, guid: 2f2b030bdb77a1241915ffb722ed4642, type: 3}
-  Limbs:
+  HitVFX: {fileID: 5880797563127281583, guid: 265d3a5ba69981a4698ceabcedf368b0, type: 3}
+  limbs:
   - {fileID: 2368140917851245090}
   - {fileID: 2958104701393581562}
   - {fileID: 2777122734477268703}
@@ -4431,12 +4430,11 @@ MonoBehaviour:
   - {fileID: 7772824320756050039}
   - {fileID: 5004776398900802992}
   - {fileID: 3116908270007129729}
-  RedTeamMat: {fileID: 2100000, guid: 8a3c874244e1b214a86d2c06a8344c94, type: 2}
-  YellowTeamMat: {fileID: 2100000, guid: 7b1f4f50d505a1c40a0edd88d67c5efe, type: 2}
-  RedTeamLayer:
+  redTeamMat: {fileID: 2100000, guid: 8a3c874244e1b214a86d2c06a8344c94, type: 2}
+  yellowTeamMat: {fileID: 2100000, guid: 7b1f4f50d505a1c40a0edd88d67c5efe, type: 2}
+  redTeamLayer:
     serializedVersion: 2
     m_Bits: 8
-  playerParent: {fileID: 6578474812732972780}
 --- !u!114 &816307798500364758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4465,6 +4463,8 @@ MonoBehaviour:
   view: {fileID: 0}
   IsPlayerInYellowTeam: 0
   nickNameText: {fileID: 2871622479564586325}
+  MoveSpeed: 30000
+  jumpForce: 300000
   staminaBar: {fileID: 914038701937272810}
   hitForceBar: {fileID: 1299766496180379478}
   HitForceLimit: 40

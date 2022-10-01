@@ -10,6 +10,10 @@ public class PlayerStat : MonoBehaviour
     public bool IsPlayerInYellowTeam;
     [SerializeField] private TextMeshProUGUI nickNameText;
 
+    // Movement variables
+    public float MoveSpeed = 30000;
+    public float jumpForce = 300000;
+
     // Stamina
     [SerializeField] private Image staminaBar;
     float staminaStartValue;

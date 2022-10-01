@@ -6,58 +6,52 @@ using Photon.Realtime;
 
 public class PlayerMovment : MonoBehaviourPunCallbacks
 {
-    // Variables will be rearranged. 30.09.2022;
+    [SerializeField] private Camera mainCam;
 
-    // Variables related to 'Animation and Physics'.
-
+    [Header("Animation And Physics")]
+    
+    // Variables related to 'Ragdoll'.
+    [SerializeField] private Transform playerParent;
     [SerializeField] private Animator animator;
-
     [SerializeField] private Rigidbody hips;
-
     [SerializeField] ConfigurableJoint hipscj;
 
-    public float MoveSpeed; //-
-    [SerializeField] private Camera mainCam;
     // Variables related to 'Jump'.
-    [SerializeField] private JumpScript LeftFoot;
-    [SerializeField] private JumpScript RightFoot;
-    [SerializeField] private float jumpForce; //-
+    [SerializeField] private JumpScript leftFoot;
+    [SerializeField] private JumpScript rightFoot;
+
+    // Variables related to move
+    Vector3 direction;
+    bool isFillingStamina = true;
 
     // Variables related to 'Hit'.
-   
-  
-   
-    [SerializeField] private float hitRadius; //-
-
+    [SerializeField] private float hitRadius;
     [SerializeField] private Transform hitPoint;
-    [SerializeField] LayerMask WhomToHit;
-    public GameObject PumVFX;
+    [SerializeField] LayerMask whomToHit;
+    public GameObject HitVFX;
+    bool isPressedDown = false;
+    float ballMaxHeight = 18; //6
 
+
+    [Header("Server Related")]
     // Server related Variables.
     PhotonView view;
-    
+    PhotonInGameController gameController;
+    PlayerStat playerStat;
+
+    [Header("Team Selection")]
+    // Variables related to team selection.
+    [SerializeField] private List<GameObject> limbs = new List<GameObject>();
+
+    [SerializeField] private Material redTeamMat;
+    [SerializeField] private Material yellowTeamMat;
+
+    [SerializeField] private LayerMask redTeamLayer;
 
     GameObject fieldTeleportPointYellow;
     GameObject fieldTeleportPointRed;
-    PhotonInGameController gameController;
-    PlayerStat playerStat;
-    [SerializeField] private List<GameObject> Limbs = new List<GameObject>();
-    
-    [SerializeField] private Material RedTeamMat;
-    [SerializeField] private Material YellowTeamMat;
-    
-    [SerializeField] private LayerMask RedTeamLayer;
-
-    [SerializeField] private Transform playerParent;
-
-    Vector3 direction;
-   
-    float staminaTimer;
 
 
-    bool IsPressedDown = false;
-
-    Vector3 camY;
     private void Start()
     {
         view = GetComponent<PhotonView>();
@@ -68,6 +62,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         fieldTeleportPointRed = GameObject.Find("FieldTeleportPointRed");
 
         StartCoroutine(Co_FillHitForce());
+        StartCoroutine(Co_FillStamina());
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -88,7 +83,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
         if (view.IsMine)
         {
-            staminaTimer += Time.deltaTime;
+            
 
             Jump();
             Hit();
@@ -96,8 +91,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             if (PhotonNetwork.IsMasterClient && Input.GetKeyDown(KeyCode.X) && !gameController.HasGameBegun)
                 gameController.StartTheGame();
 
-            camY = new Vector3(0, mainCam.transform.localPosition.y, 0);
-           
+
+          
         }
       
     }
@@ -112,9 +107,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     public void Initial_TeleportToFieldYellow()
     {
         playerParent.SetPositionAndRotation(fieldTeleportPointYellow.transform.position, fieldTeleportPointYellow.transform.rotation);
-        foreach (GameObject limb in Limbs)
+        foreach (GameObject limb in limbs)
         {
-            limb.GetComponent<MeshRenderer>().material = YellowTeamMat;
+            limb.GetComponent<MeshRenderer>().material = yellowTeamMat;
 
         }
 
@@ -124,11 +119,11 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     public void Initial_TeleportToFieldRed()
     {
         playerParent.SetPositionAndRotation(fieldTeleportPointRed.transform.position, fieldTeleportPointRed.transform.rotation);
-        foreach (GameObject limb in Limbs)
+        foreach (GameObject limb in limbs)
         {
-            limb.GetComponent<MeshRenderer>().material = RedTeamMat;
+            limb.GetComponent<MeshRenderer>().material = redTeamMat;
 
-            limb.layer = RedTeamLayer;
+            limb.layer = redTeamLayer;
         }
 
     }
@@ -219,7 +214,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             animator.SetBool("isrun", false);
 
             hips.velocity = new Vector3(0, hips.velocity.y, 0);
-            FillStamina();
+            isFillingStamina = true;
         }
 
 
@@ -227,43 +222,50 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     Vector3 move(Vector3 _movedir)
     {
-        if (Input.GetKey(KeyCode.LeftShift) && playerStat.Stamina > 0)
+        if (Input.GetKey(KeyCode.LeftShift) && playerStat.Stamina > 0) // run
         {
-            _movedir = _movedir.normalized * MoveSpeed * 2.4f * Time.deltaTime;
+            isFillingStamina = false;
+            
+            _movedir = _movedir.normalized * playerStat.MoveSpeed * 2.4f * Time.deltaTime;
             playerStat.Stamina -= 2;
 
         }
-        else
+        else // walk
         {
-            _movedir = _movedir.normalized * MoveSpeed * Time.deltaTime;
-            FillStamina();
+            _movedir = _movedir.normalized * playerStat.MoveSpeed * Time.deltaTime;
+            isFillingStamina = true;
         }
 
         return _movedir;
     }
 
-    void FillStamina()
+   
+    IEnumerator Co_FillStamina()
     {
-        if (staminaTimer > 0.15f && playerStat.Stamina < 100)
+        while (true)
         {
-            staminaTimer = 0;
-            playerStat.Stamina += 1;
+            if(playerStat.Stamina < 100 && isFillingStamina)
+            {
 
+                playerStat.Stamina += 1;
+                yield return new WaitForSeconds(0.15f);
+            }
 
+            yield return null;
         }
 
-
     }
+
 
 
     public void Jump()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (LeftFoot.IsGrounded || RightFoot.IsGrounded)
+            if (leftFoot.IsGrounded || rightFoot.IsGrounded)
             {
 
-                hips.AddForce(0, jumpForce * Time.fixedDeltaTime, 0);
+                hips.AddForce(0, playerStat.jumpForce * Time.fixedDeltaTime, 0);
 
             }
 
@@ -287,14 +289,14 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             // Apply force to the target object.
             view.RPC("ApplyForceToTarget", RpcTarget.All);
             // Reset Hitforce
-            IsPressedDown = false;
+            isPressedDown = false;
             playerStat.HitForce = 0;
 
         }
 
         if (Input.GetMouseButtonDown(0))
         {
-            IsPressedDown = true;
+            isPressedDown = true;
         }
 
 
@@ -304,7 +306,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     {
         while (true)
         {
-            if (IsPressedDown)
+            if (isPressedDown)
             {
                 playerStat.HitForce = Mathf.Clamp(playerStat.HitForce, 0, playerStat.HitForceLimit);
                 playerStat.HitForce += 2f;
@@ -324,7 +326,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     public void ApplyForceToTarget()
     {
 
-        Collider[] _hitSphere = Physics.OverlapSphere(hitPoint.position, hitRadius, WhomToHit);
+        Collider[] _hitSphere = Physics.OverlapSphere(hitPoint.position, hitRadius, whomToHit);
         for (int i = 0; i < _hitSphere.Length; i++)
         {
 
@@ -338,11 +340,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                     _balljoint.breakForce = 0;
                     _balljoint.breakTorque = 0;
 
-                    float camY = mainCam.transform.localPosition.y;
-                    camY = Mathf.Clamp(mainCam.transform.localPosition.y, 0, 15); // inverse and balance.
-                    
-                    Debug.Log(camY);
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce( (hitPoint.forward * playerStat.HitForce) + new Vector3(0, camY , 0), ForceMode.Impulse);
+                   
+
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce( (hitPoint.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight) , 0), ForceMode.Impulse);
 
 
 
@@ -356,7 +356,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
                 }
 
                 // Will be excecuted in a better way when switched to online.
-                Instantiate(PumVFX, _hitSphere[i].transform.position, Quaternion.identity);
+                Instantiate(HitVFX, _hitSphere[i].transform.position, Quaternion.identity);
 
             }
 
