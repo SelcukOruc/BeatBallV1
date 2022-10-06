@@ -25,13 +25,18 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     bool isFillingStamina = true;
 
     // Variables related to 'Hit'.
-    [SerializeField] private float hitRadius;
+    [Header("HIT")]
     [SerializeField] private Transform hitPoint;
-    [SerializeField] LayerMask whomToHit;
+    [SerializeField] private LayerMask whomToHit;
+    [SerializeField] private float hitRadius;
     public GameObject HitVFX;
     bool isPressedDown = false;
     float ballMaxHeight = 18; //6
 
+    public BallController ballController;
+    public GameObject Ball;
+    [SerializeField] private Collider ballControlCollider;
+    public bool OnHitBall;
 
     [Header("Server Related")]
     // Server related Variables.
@@ -51,7 +56,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     GameObject fieldTeleportPointYellow;
     GameObject fieldTeleportPointRed;
 
-
+   
+ 
     private void Start()
     {
         view = GetComponent<PhotonView>();
@@ -63,6 +69,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
         StartCoroutine(Co_FillHitForce());
         StartCoroutine(Co_FillStamina());
+        StartCoroutine(Co_ActivateCollider());
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -83,19 +90,21 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
         if (view.IsMine)
         {
-            
 
             Jump();
             Hit();
-
+           
             if (PhotonNetwork.IsMasterClient && Input.GetKeyDown(KeyCode.X) && !gameController.HasGameBegun)
                 gameController.StartTheGame();
 
-
-          
+         
         }
       
     }
+
+
+
+
 
 
     #region Game Begun
@@ -109,7 +118,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         playerParent.SetPositionAndRotation(fieldTeleportPointYellow.transform.position, fieldTeleportPointYellow.transform.rotation);
         foreach (GameObject limb in limbs)
         {
-            limb.GetComponent<MeshRenderer>().material = yellowTeamMat;
+            if (limb.TryGetComponent<MeshRenderer>(out MeshRenderer mesh))
+                mesh.material = yellowTeamMat;
 
         }
 
@@ -121,7 +131,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         playerParent.SetPositionAndRotation(fieldTeleportPointRed.transform.position, fieldTeleportPointRed.transform.rotation);
         foreach (GameObject limb in limbs)
         {
-            limb.GetComponent<MeshRenderer>().material = redTeamMat;
+            if(limb.TryGetComponent<MeshRenderer>(out MeshRenderer mesh))
+                mesh.material = redTeamMat;
 
             limb.layer = redTeamLayer;
         }
@@ -233,6 +244,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         else // walk
         {
             _movedir = _movedir.normalized * playerStat.MoveSpeed * Time.deltaTime;
+           
             isFillingStamina = true;
         }
 
@@ -244,13 +256,15 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     {
         while (true)
         {
-            if(playerStat.Stamina < 100 && isFillingStamina)
+            if(playerStat.Stamina < (playerStat.staminaStartValue + 1) && isFillingStamina && ballControlCollider.enabled)
             {
 
-                playerStat.Stamina += 1;
+                playerStat.Stamina += 2;
                 yield return new WaitForSeconds(0.15f);
+               
+            
             }
-
+          
             yield return null;
         }
 
@@ -276,9 +290,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     }
 
 
-    // 30.09.2022 - There appears to be a problem after implementing Hitforce,which stems from colliders,
-    // i will think and search for a better approach.
-    // Problem solved temporarily.
+    // HIT
+
     public void Hit()
     {
 
@@ -287,7 +300,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             // make anim work.
             animator.SetTrigger("hit");
             // Apply force to the target object.
-            view.RPC("ApplyForceToTarget", RpcTarget.All);
+            view.RPC("ApplyForceToTarget",RpcTarget.All);
             // Reset Hitforce
             isPressedDown = false;
             playerStat.HitForce = 0;
@@ -321,7 +334,6 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     }
 
 
-
     [PunRPC]
     public void ApplyForceToTarget()
     {
@@ -332,35 +344,35 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
             if (_hitSphere[i].GetComponent<Rigidbody>() != null)
             {
-                if (_hitSphere[i].tag == "Ball" && _hitSphere[i].GetComponent<SpringJoint>() != null)
+                if (_hitSphere[i].tag == "Ball" && _hitSphere[i].GetComponent<PhotonView>().Owner == view.Owner) // only if i have the ball, i can breake all bonds. 'till then stamina goes down.
                 {
-                    SpringJoint _balljoint = _hitSphere[i].GetComponent<SpringJoint>();
-                    _balljoint.spring = 0;
-                    _balljoint.breakForce = 0;
-                    _balljoint.breakTorque = 0;
-                    _balljoint.connectedBody = null;
+                   // Checking Ownership.
+                    PhotonView _ballPhotonview = _hitSphere[i].GetComponent<PhotonView>();
+                    if (_ballPhotonview.Owner != view.Owner)
+                        _ballPhotonview.TransferOwnership(view.Owner);
 
-
-
-
-
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce( (hitPoint.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight) , 0), ForceMode.Impulse);
-
+                    // Breaking Bonds.
+                    base.photonView.RPC("BreakBallsBonds", RpcTarget.All); // ball is used here.
+                    // Adding Force.                                                       
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce((hitPoint.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight), 0), ForceMode.Impulse);
+                    OnHitBall = true;
 
 
                 }
-
 
                 if (_hitSphere[i].tag == "Player")
                 {
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * playerStat.HitForce * 30, ForceMode.Impulse); // hit force for other players value should be locally assaigned. 1.10.2022
-
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * 25 * 30, ForceMode.Impulse); // hit force for other players value should be locally assaigned. 1.10.2022
+                    Instantiate(HitVFX, _hitSphere[i].transform.position, Quaternion.identity);
                 }
 
                 // Will be excecuted in a better way when switched to online.
-                Instantiate(HitVFX, _hitSphere[i].transform.position, Quaternion.identity);
+              
+
+
 
             }
+          
 
 
         }
@@ -369,12 +381,54 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     }
 
 
-
-    private void OnDrawGizmos()
+    [PunRPC]
+    public void BreakBallsBonds()
     {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(hitPoint.position, hitRadius);
+        if (Ball.TryGetComponent<SpringJoint>(out SpringJoint _sJoint))
+        {
+            _sJoint.breakForce = 0;
+            ballController.HasBallImage.SetActive(false);
+        }
     }
+    IEnumerator Co_ActivateCollider()
+    {
+        while (true)
+        {
+            // We have ball and hit it.
+            if (OnHitBall)
+            {
+                yield return new WaitForSeconds(1);
+                ballControlCollider.enabled = true;
+                OnHitBall = false;
+            }
+
+            else
+            {
+                // We have ball but we don't hit it
+                if (ballControlCollider.enabled == false)
+                {
+                    if (playerStat.Stamina <= 0)
+                    {
+                        view.RPC("BreakBallsBonds", RpcTarget.All);
+                        yield return new WaitForSeconds(2);
+                        OnHitBall = true;
+                    }
+
+                    playerStat.Stamina -= 2;
+
+
+                    yield return new WaitForSeconds(0.1f);
+
+                }
+
+                yield return null;
+
+            }
+
+        }
+
+    }
+
 
     #endregion
 
@@ -387,7 +441,51 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     }
 
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(hitPoint.position, hitRadius);
+    }
+
+
+ 
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

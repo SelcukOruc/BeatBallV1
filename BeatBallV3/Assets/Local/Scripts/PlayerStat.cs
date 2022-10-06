@@ -16,8 +16,8 @@ public class PlayerStat : MonoBehaviour
 
     // Stamina
     [SerializeField] private Image staminaBar;
-    float staminaStartValue;
-    private float stamina = 99;
+    [HideInInspector] public float staminaStartValue;
+    private float stamina = 200;
     public float Stamina
     {
         set
@@ -42,7 +42,7 @@ public class PlayerStat : MonoBehaviour
     [SerializeField] private Image hitForceBar;
     private float hitForce;
     float hitForceStartValue; // Maximum force reachable.
-    public float HitForceLimit;
+    public float HitForceLimit; //40
     public float HitForce
     {
         get
@@ -58,6 +58,7 @@ public class PlayerStat : MonoBehaviour
     
     }
 
+    
     private void Awake()
     {
         view = GetComponent<PhotonView>();

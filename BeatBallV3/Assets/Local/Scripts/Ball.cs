@@ -9,7 +9,9 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     [SerializeField] private PhotonView view;
     [SerializeField] private PhotonInGameController gameController;
     [SerializeField] private GameStat gameStat;
-    
+
+
+   
 
     private void Start()
     {
@@ -27,12 +29,15 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
             if (collision.gameObject.tag == "RedInside")
                 view.RPC("RPC_OnYellowScored_Ball", RpcTarget.All);
 
+          
+
         }
+       
+       
 
 
     }
-
-
+   
 
     // Raise event seems to be better option 1.10.2022
     [PunRPC]
@@ -99,7 +104,8 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     {
         if (targetView != base.photonView)
             return;
-       // here can be used rather than ball controller.
+        
+       
     }
 
     public void OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)
@@ -107,7 +113,7 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
         throw new System.NotImplementedException();
     }
 
-   
+  
 
 }
 

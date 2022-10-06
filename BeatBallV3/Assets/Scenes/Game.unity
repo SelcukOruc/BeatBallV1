@@ -353,6 +353,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Players: []
+  RedTeamPlayers: []
+  YellowTeamPlayers: []
+  RedTeamLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  YellowTeamLayer:
+    serializedVersion: 2
+    m_Bits: 8
   PlayerPrefab: {fileID: 5798488962252505951, guid: edf46b1b2b848564aa0c65bb4cf4622a, type: 3}
   SpawnPos: {fileID: 87285774}
   StartButton: {fileID: 0}

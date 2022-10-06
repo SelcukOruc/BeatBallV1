@@ -8,6 +8,12 @@ using TMPro;
 public class PhotonInGameController : MonoBehaviourPunCallbacks
 {
     public List<GameObject> Players = new List<GameObject>();
+    
+    public List<GameObject> RedTeamPlayers = new List<GameObject>();
+    public List<GameObject> YellowTeamPlayers = new List<GameObject>();
+
+    public LayerMask RedTeamLayer;
+    public LayerMask YellowTeamLayer;
 
     [SerializeField] private GameObject PlayerPrefab;
     [SerializeField] private Transform SpawnPos;
@@ -53,6 +59,8 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
 
 
         Players.Clear();
+        YellowTeamPlayers.Clear();
+        RedTeamPlayers.Clear();
 
         foreach (var player in PhotonNetwork.PlayerList)
         {
@@ -60,8 +68,15 @@ public class PhotonInGameController : MonoBehaviourPunCallbacks
 
             GameObject _playerFound = GameObject.Find(player.NickName);
             Players.Add(_playerFound);
-           
 
+            if (_playerFound.GetComponent<PlayerStat>().IsPlayerInYellowTeam)
+                YellowTeamPlayers.Add(_playerFound);
+            else
+                RedTeamPlayers.Add(_playerFound);
+          
+
+
+       
         }
 
 

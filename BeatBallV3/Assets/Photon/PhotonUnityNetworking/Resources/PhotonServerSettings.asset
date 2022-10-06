@@ -34,13 +34,6 @@ MonoBehaviour:
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
-  - ClickRpc
-  - DestroyRpc
-  - DestroySpaceship
-  - Fire
-  - RespawnSpaceship
-  - SyncTargetRot
-  - ApplyForceToTarget
   - UpdateName
   - TeleportToField
   - GameBegun
@@ -48,25 +41,26 @@ MonoBehaviour:
   - TeamRed
   - TeamYellow
   - TeleportToFieldRed
-  - Deneme
   - OnRedScored
   - OnYellowScored
-  - veriTest
-  - Puf
-  - CarryPlayers
   - MovePlayersToPos
-  - AfterScore
   - FindPlayersInRoom
-  - PufEtBeni
-  - OnScored
-  - OnRedScoredP
-  - OnYellowScoredP
-  - OnFallen
   - OnRedScored_Ball
   - RPC_OnRedScored_Ball
   - Initial_TeleportToFieldRed
   - Initial_TeleportToFieldYellow
   - RPC_OnYellowScored_Ball
+  - ClickRpc
+  - DestroyRpc
+  - DestroySpaceship
+  - Fire
+  - RespawnSpaceship
+  - ApplyForceToTarget
+  - OnBallOwnerChanged
+  - ThrowBall
+  - WhenBabaWhen
+  - BreakBallsBonds
+  - OnOwnerActs
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
