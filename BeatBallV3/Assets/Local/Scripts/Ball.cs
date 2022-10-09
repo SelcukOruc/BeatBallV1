@@ -10,8 +10,8 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     [SerializeField] private PhotonInGameController gameController;
     [SerializeField] private GameStat gameStat;
 
-   
 
+    public Transform m_Ballpos;
     private void Start()
     {
         gameController = GameObject.FindObjectOfType<PhotonInGameController>();
@@ -29,8 +29,18 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
                 view.RPC("RPC_OnYellowScored_Ball", RpcTarget.All);
         }
 
-       
 
+        if (collision.gameObject.tag == "Player" )
+        {
+           
+            
+            PhotonView _playerPhotonview = collision.gameObject.GetComponentInParent<PhotonView>();
+            if (_playerPhotonview.Owner != view.Owner)
+                view.TransferOwnership(_playerPhotonview.Owner);
+
+            m_Ballpos = collision.gameObject.GetComponent<BallController>().BallPos;
+
+        }
 
 
 
@@ -111,8 +121,12 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     }
 
 
-    
-   
+    private void Update()
+    {
+        if (m_Ballpos != null)
+            transform.position = m_Ballpos.position;
+    }
+
 }
 
 

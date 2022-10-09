@@ -133,7 +133,7 @@ MonoBehaviour:
   view: {fileID: 7322174018611963299}
   gameController: {fileID: 0}
   gameStat: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Ballpos: {fileID: 0}
 --- !u!114 &7322174018611963299
 MonoBehaviour:
   m_ObjectHideFlags: 0

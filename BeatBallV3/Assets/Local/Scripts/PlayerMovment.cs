@@ -305,7 +305,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             // make anim work.
             animator.SetTrigger("hit");
             // Apply force to the target object.
-            
+            ApplyForceToTarget();
             // Reset Hitforce
             isPressedDown = false;
             playerStat.HitForce = 0;
@@ -338,13 +338,52 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     }
 
-    [PunRPC]
+   
     public void ApplyForceToTarget()
     {
+        Collider[] _hitSphere = Physics.OverlapSphere(hitPoint.position, hitRadius, whomToHit);
+        for (int i = 0; i < _hitSphere.Length; i++)
+        {
+
+            if (_hitSphere[i].GetComponent<Rigidbody>() != null)
+            {
+                if (_hitSphere[i].tag == "Ball")
+                {
+                    PhotonView _ballPhotonview = _hitSphere[i].GetComponent<PhotonView>();
+                    if (_ballPhotonview.Owner != view.Owner)
+                        _ballPhotonview.TransferOwnership(view.Owner);
+
+                   
+
+                    _hitSphere[i].GetComponent<Rigidbody>().AddForce((mainCam.transform.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight), 0), ForceMode.Impulse);
+
+                }
+
+
+
+
+                //if (_hitSphere[i].tag == "Player")
+                //{
+                //    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * 40 * 30, ForceMode.Impulse); // hit force for other players value should be locally assaigned. 1.10.2022
+
+                //}
+
+                // Will be excecuted in a better way when switched to online.
+                Instantiate(HitVFX, _hitSphere[i].transform.position, Quaternion.identity);
+
+
+
+            }
+
+
+
+        }
 
     }
 
-#endregion
+
+
+    #endregion
 
 
 
