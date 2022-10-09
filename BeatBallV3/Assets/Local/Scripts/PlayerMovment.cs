@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 public class PlayerMovment : MonoBehaviourPunCallbacks
 {
@@ -53,8 +54,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     GameObject fieldTeleportPointYellow;
     GameObject fieldTeleportPointRed;
 
-
-    
+   
     private void Start()
     {
         view = GetComponent<PhotonView>();
@@ -87,6 +87,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     private void Update()
     {
 
+       
+       
+
         if (view.IsMine)
         {
 
@@ -98,7 +101,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
          
         }
-      
+       
     }
 
 
@@ -293,7 +296,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     #region Hit
 
     // HIT
-
+ 
     public void Hit()
     {
 
@@ -302,7 +305,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             // make anim work.
             animator.SetTrigger("hit");
             // Apply force to the target object.
-            view.RPC("ApplyForceToTarget", RpcTarget.All);
+            
             // Reset Hitforce
             isPressedDown = false;
             playerStat.HitForce = 0;
@@ -338,28 +341,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [PunRPC]
     public void ApplyForceToTarget()
     {
-        Collider[] _hitCollider = Physics.OverlapSphere(hitPoint.position, hitRadius, whomToHit);
-        
-        for (int i = 0; i < _hitCollider.Length; i++)
-        {
-            if (_hitCollider[i].tag == "Ball")
-            {
-                Ball _ballScript = _hitCollider[i].GetComponent<Ball>();
-                _ballScript.m_Controller = null;
 
-                PhotonView _ballPhotonview = _hitCollider[i].GetComponent<PhotonView>();
-                if (_ballPhotonview.Owner != view.Owner)
-                    _ballPhotonview.TransferOwnership(view.Owner);
-
-                _hitCollider[i].GetComponent<Rigidbody>().AddForce((mainCam.transform.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight), 0), ForceMode.Impulse);
-
-            }
-
-        }
-       
-    
     }
-
 
 #endregion
 
