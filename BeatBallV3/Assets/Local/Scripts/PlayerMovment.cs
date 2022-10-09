@@ -33,10 +33,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     bool isPressedDown = false;
     float ballMaxHeight = 18; //6
 
-    public BallController ballController;
-    public GameObject Ball;
-    [SerializeField] private Collider ballControlCollider;
-    public bool OnHitBall;
+   
 
     [Header("Server Related")]
     // Server related Variables.
@@ -56,20 +53,22 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     GameObject fieldTeleportPointYellow;
     GameObject fieldTeleportPointRed;
 
-   
- 
+
+    
     private void Start()
     {
         view = GetComponent<PhotonView>();
         playerStat = GetComponent<PlayerStat>();
         gameController = FindObjectOfType<PhotonInGameController>();
-       
+
+ 
+
         fieldTeleportPointYellow = GameObject.Find("FieldTeleportPointYellow");
         fieldTeleportPointRed = GameObject.Find("FieldTeleportPointRed");
 
         StartCoroutine(Co_FillHitForce());
         StartCoroutine(Co_FillStamina());
-        StartCoroutine(Co_ActivateCollider());
+       
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -189,7 +188,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     #endregion
 
 
-    #region physics
+    #region Movment
     public void Move()
     {
 
@@ -214,7 +213,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
 
             hips.AddForce(move(moveDir));
-
+            
             hips.velocity = new Vector3(0, hips.velocity.y, 0);
 
         }
@@ -256,10 +255,10 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     {
         while (true)
         {
-            if(playerStat.Stamina < (playerStat.staminaStartValue + 1) && isFillingStamina && ballControlCollider.enabled)
+            if(playerStat.Stamina < (playerStat.staminaStartValue + 1) && isFillingStamina)
             {
 
-                playerStat.Stamina += 2;
+                playerStat.Stamina += 4;
                 yield return new WaitForSeconds(0.15f);
                
             
@@ -289,6 +288,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     }
 
+    #endregion
+
+    #region Hit
 
     // HIT
 
@@ -300,7 +302,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             // make anim work.
             animator.SetTrigger("hit");
             // Apply force to the target object.
-            view.RPC("ApplyForceToTarget",RpcTarget.All);
+            view.RPC("ApplyForceToTarget", RpcTarget.All);
             // Reset Hitforce
             isPressedDown = false;
             playerStat.HitForce = 0;
@@ -322,7 +324,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             if (isPressedDown)
             {
                 playerStat.HitForce = Mathf.Clamp(playerStat.HitForce, 0, playerStat.HitForceLimit);
-                playerStat.HitForce += 2f;
+                playerStat.HitForce += 4f;
                 
                 yield return new WaitForSeconds(0.1f);
             }
@@ -333,104 +335,37 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     }
 
-
     [PunRPC]
     public void ApplyForceToTarget()
     {
-
-        Collider[] _hitSphere = Physics.OverlapSphere(hitPoint.position, hitRadius, whomToHit);
-        for (int i = 0; i < _hitSphere.Length; i++)
+        Collider[] _hitCollider = Physics.OverlapSphere(hitPoint.position, hitRadius, whomToHit);
+        
+        for (int i = 0; i < _hitCollider.Length; i++)
         {
-
-            if (_hitSphere[i].GetComponent<Rigidbody>() != null)
+            if (_hitCollider[i].tag == "Ball")
             {
-                if (_hitSphere[i].tag == "Ball" && _hitSphere[i].GetComponent<PhotonView>().Owner == view.Owner) // only if i have the ball, i can breake all bonds. 'till then stamina goes down.
-                {
-                   // Checking Ownership.
-                    PhotonView _ballPhotonview = _hitSphere[i].GetComponent<PhotonView>();
-                    if (_ballPhotonview.Owner != view.Owner)
-                        _ballPhotonview.TransferOwnership(view.Owner);
+                Ball _ballScript = _hitCollider[i].GetComponent<Ball>();
+                _ballScript.m_Controller = null;
 
-                    // Breaking Bonds.
-                    base.photonView.RPC("BreakBallsBonds", RpcTarget.All); // ball is used here.
-                    // Adding Force.                                                       
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce((hitPoint.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight), 0), ForceMode.Impulse);
-                    OnHitBall = true;
+                PhotonView _ballPhotonview = _hitCollider[i].GetComponent<PhotonView>();
+                if (_ballPhotonview.Owner != view.Owner)
+                    _ballPhotonview.TransferOwnership(view.Owner);
 
-
-                }
-
-                if (_hitSphere[i].tag == "Player")
-                {
-                    _hitSphere[i].GetComponent<Rigidbody>().AddForce(hitPoint.forward * 25 * 30, ForceMode.Impulse); // hit force for other players value should be locally assaigned. 1.10.2022
-                    Instantiate(HitVFX, _hitSphere[i].transform.position, Quaternion.identity);
-                }
-
-                // Will be excecuted in a better way when switched to online.
-              
-
-
-
-            }
-          
-
-
-        }
-
-
-    }
-
-
-    [PunRPC]
-    public void BreakBallsBonds()
-    {
-        if (Ball.TryGetComponent<SpringJoint>(out SpringJoint _sJoint))
-        {
-            _sJoint.breakForce = 0;
-            ballController.HasBallImage.SetActive(false);
-        }
-    }
-    IEnumerator Co_ActivateCollider()
-    {
-        while (true)
-        {
-            // We have ball and hit it.
-            if (OnHitBall)
-            {
-                yield return new WaitForSeconds(1);
-                ballControlCollider.enabled = true;
-                OnHitBall = false;
-            }
-
-            else
-            {
-                // We have ball but we don't hit it
-                if (ballControlCollider.enabled == false)
-                {
-                    if (playerStat.Stamina <= 0)
-                    {
-                        view.RPC("BreakBallsBonds", RpcTarget.All);
-                        yield return new WaitForSeconds(2);
-                        OnHitBall = true;
-                    }
-
-                    playerStat.Stamina -= 2;
-
-
-                    yield return new WaitForSeconds(0.1f);
-
-                }
-
-                yield return null;
+                _hitCollider[i].GetComponent<Rigidbody>().AddForce((mainCam.transform.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight), 0), ForceMode.Impulse);
 
             }
 
         }
-
+       
+    
     }
 
 
-    #endregion
+#endregion
+
+
+
+
 
 
 

@@ -17,7 +17,7 @@ public class PlayerStat : MonoBehaviour
     // Stamina
     [SerializeField] private Image staminaBar;
     [HideInInspector] public float staminaStartValue;
-    private float stamina = 200;
+    [SerializeField] private float stamina = 300;
     public float Stamina
     {
         set
@@ -66,7 +66,7 @@ public class PlayerStat : MonoBehaviour
         
         staminaStartValue = stamina;
         hitForceStartValue = HitForceLimit;
-
+        
 
     }
 

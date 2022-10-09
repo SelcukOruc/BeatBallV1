@@ -10,7 +10,7 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
     [SerializeField] private PhotonInGameController gameController;
     [SerializeField] private GameStat gameStat;
 
-
+   public Transform m_Controller;
    
 
     private void Start()
@@ -28,12 +28,25 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
            
             if (collision.gameObject.tag == "RedInside")
                 view.RPC("RPC_OnYellowScored_Ball", RpcTarget.All);
-
-          
-
         }
-       
-       
+
+        if (collision.gameObject.tag == "Player" && m_Controller==null)
+        {
+            // OWNERSHIP 
+            PhotonView _playerPhotonview = collision.gameObject.GetComponentInParent<PhotonView>();   
+            if (view.Owner != _playerPhotonview.Owner)
+                view.TransferOwnership(_playerPhotonview.Owner);
+           
+            BallController _ballController= collision.gameObject.GetComponent<BallController>();
+
+            m_Controller = _ballController.BallPos;
+
+     
+         
+        }
+
+
+
 
 
     }
@@ -73,11 +86,9 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
 
     public void RevertBallPos()
     {
-        if (TryGetComponent<SpringJoint>(out SpringJoint _joint))
-        {
-            _joint.connectedBody = null;
-        }
+
         transform.position = new Vector3(0, 6, 3);
+
     }
 
 
@@ -113,7 +124,18 @@ public class Ball : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
         throw new System.NotImplementedException();
     }
 
-  
+
+    private void Update()
+    {
+        if (m_Controller != null)
+        {
+            this.transform.position = m_Controller.position;
+        }
+
+
+    }
+
+
 
 }
 
