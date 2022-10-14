@@ -32,14 +32,13 @@ public class CreateOrJoinRooms : MonoBehaviourPunCallbacks
         options.MaxPlayers = 4;
         options.BroadcastPropsChangeToAll = true;
         Hashtable RoomCutomProps = new Hashtable();
-        RoomCutomProps.Add("REDTEAMSCORE", 0);
-        RoomCutomProps.Add("GREENTEAMSCORE", 0);
-
         int _timeLimitInput = int.Parse(TimeLimitInputField.text);
         int _scoreLimitInput = int.Parse(ScoreLimitInputField.text);
 
-        RoomCutomProps.Add("TIMELIMIT",_timeLimitInput);
-        RoomCutomProps.Add("SCORELIMIT",_scoreLimitInput);
+        RoomCutomProps.Add("TIMELIMIT", _timeLimitInput);
+        RoomCutomProps.Add("SCORELIMIT", _scoreLimitInput);
+
+
         options.CustomRoomProperties = RoomCutomProps;
 
 

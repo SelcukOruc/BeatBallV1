@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] private TextMeshProUGUI redTeamScoreText, greenTeamScoreText,scoreLimitText;
 
     public Vector3 RedTeamPos, GreenTeamPos,StartPos;
-    public Vector3 BallPos;
+    public Vector3 BallInsPos;
 
     private void Start()
     {
@@ -43,82 +43,84 @@ public class GameManager : MonoBehaviourPunCallbacks
         StartCoroutine(Co_timer());
     }
 
-
+    [PunRPC]
     public void OnRedTeamScored()
     {
+
+
         RedTeamScore++;
-        PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { "REDTEAMSCORE", RedTeamScore } });
+        OnScored();
 
     }
 
 
 
 
-
+    [PunRPC]
     public void OnGreenTeamScored()
     {
+
         GreenTeamScore++;
-        PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { "GREENTEAMSCORE", GreenTeamScore } });
+        OnScored();
 
     }
 
 
 
 
-    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+
+
+
+
+
+    void OnScored()
     {
-       
-        // ON SCORED.
-        if(propertiesThatChanged.ContainsKey("GREENTEAMSCORE") || propertiesThatChanged.ContainsKey("REDTEAMSCORE"))
+        SetScoreText();
+        OnReachedScoreLimit();
+        foreach (var player in PhotonManager.ins.Players)
         {
-            
-           
-            foreach (var player in PhotonManager.ins.Players)
-            {
-                player.GetComponent<PlayerMovment>().TeleportToPos();
-            }
-            
-            Ball.ins.RevertBallPos();
-            Debug.Log("scored.");
-            OnReachedScoreLimit();
-            SetScoreText();
+            player.GetComponent<PlayerMovment>().TeleportToPos();
         }
-    
+
+        Ball.ins.RevertBallPos();
+       
+       
+      
     }
 
 
     void SetScoreText()
     {
-        redTeamScoreText.text = PhotonNetwork.CurrentRoom.CustomProperties["REDTEAMSCORE"].ToString();
-        greenTeamScoreText.text = PhotonNetwork.CurrentRoom.CustomProperties["GREENTEAMSCORE"].ToString();
+        redTeamScoreText.text = RedTeamScore.ToString();
+        greenTeamScoreText.text = GreenTeamScore.ToString();
     
     }
 
     public void OnReachedScoreLimit()
     {
-        int _totalScore = (int)PhotonNetwork.CurrentRoom.CustomProperties["REDTEAMSCORE"] + (int)PhotonNetwork.CurrentRoom.CustomProperties["GREENTEAMSCORE"];
+        int _totalScore = RedTeamScore + GreenTeamScore;
         int _scoreLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["SCORELIMIT"];
 
-        int _redTeamScore = (int)PhotonNetwork.CurrentRoom.CustomProperties["REDTEAMSCORE"];
-        int _greenTeamScore = (int)PhotonNetwork.CurrentRoom.CustomProperties["GREENTEAMSCORE"];
+        int _redScore = RedTeamScore;
+        int _greenScore = GreenTeamScore;
 
         if ( _totalScore == _scoreLimit || minute == (int)PhotonNetwork.CurrentRoom.CustomProperties["TIMELIMIT"])
         {
             PhotonManager.ins.HasGameBegun = false;
-            
 
-         
+
+            Debug.Log("Game finished.");
             
-                if (_greenTeamScore > _redTeamScore)
+                if (_greenScore > _redScore)
                 {
                     Debug.Log("Green Team Won");
 
                 }
-                if (_redTeamScore > _greenTeamScore)
+                if (_redScore > _greenScore)
                 {
                     Debug.Log("Red Team Won");
                 }
-                if (_greenTeamScore == _redTeamScore)
+                if (_redScore == _greenScore)
                 {
                     Debug.Log("Teams Are Equal.");
 

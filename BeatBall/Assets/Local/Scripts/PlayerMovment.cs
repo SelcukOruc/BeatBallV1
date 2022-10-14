@@ -214,7 +214,7 @@ public class PlayerMovment : MonoBehaviourPun
             if (isPressedDown)
             {
                 playerStat.HitForce = Mathf.Clamp(playerStat.HitForce, 0, playerStat.HitForceLimit);
-                playerStat.HitForce += 8f;
+                playerStat.HitForce += 4f;
 
                 yield return new WaitForSeconds(0.1f);
             }

@@ -23,7 +23,7 @@ public class Ball : MonoBehaviourPun, IPunOwnershipCallbacks
 
     public Transform BallPos;
     public PhotonView m_View;
-    
+    [SerializeField] private Rigidbody myRg;
 
 
 
@@ -59,7 +59,9 @@ public class Ball : MonoBehaviourPun, IPunOwnershipCallbacks
 
     public void RevertBallPos()
     {
-        transform.position = Vector3.zero;
+        BallPos = null;
+        myRg.velocity = Vector3.zero;
+        transform.position =GameManager.ins.BallInsPos;
       
     }
 

@@ -44,7 +44,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         
         
         if (PhotonNetwork.IsMasterClient)
-            PhotonNetwork.InstantiateRoomObject(ball.name, Vector3.one * 2, Quaternion.identity);
+            PhotonNetwork.InstantiateRoomObject(ball.name, GameManager.ins.BallInsPos, Quaternion.identity);
 
       
         
