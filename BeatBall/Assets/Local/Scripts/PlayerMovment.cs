@@ -21,7 +21,7 @@ public class PlayerMovment : MonoBehaviourPun
     [SerializeField] private LayerMask whomToHit;
     [SerializeField] private PhotonView pv_BallController;
     [SerializeField] private float radius;
-    float ballMaxHeight = 18; //6
+    public float ballMaxHeight = 18; //6
     bool isPressedDown = false;
 
 
@@ -69,7 +69,7 @@ public class PlayerMovment : MonoBehaviourPun
                 playerListPanel.SetActive(false);
 
         }
-
+     
     }
 
 
