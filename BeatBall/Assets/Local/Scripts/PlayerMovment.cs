@@ -33,19 +33,23 @@ public class PlayerMovment : MonoBehaviourPun
 
     public List<GameObject> Limbs = new List<GameObject>();
     public LayerMask GreenTeamLayerMask;
+    GameObject playerListPanel;
+
+   
+
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-
+        playerListPanel = GameObject.Find("PlayerListing");
         playerStat = GetComponent<PlayerStat>();
         view = GetComponent<PhotonView>();
 
         StartCoroutine(Co_FillStamina());
         StartCoroutine(Co_FillHitForce());
 
-
+       
     }
 
     private void Update()
@@ -57,8 +61,13 @@ public class PlayerMovment : MonoBehaviourPun
                 Move();
                 Jump();
                 Hit();
-            
-           
+
+            // should be more efficient and decently organized.
+            if (Input.GetKey(KeyCode.Tab))
+                playerListPanel.SetActive(true);
+            else
+                playerListPanel.SetActive(false);
+
         }
 
     }

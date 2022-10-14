@@ -22,9 +22,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public bool CanPlayerFunction = true;
 
-    int scoreLimit;
+    int scoreLimit,timeLimit;
     private float second,minute;
-    [SerializeField] private TextMeshProUGUI timeText;
+    [SerializeField] private TextMeshProUGUI timeText,timeLimitText;
 
     public int RedTeamScore, GreenTeamScore;
     [SerializeField] private TextMeshProUGUI redTeamScoreText, greenTeamScoreText,scoreLimitText;
@@ -35,7 +35,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         scoreLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["SCORELIMIT"];
-        scoreLimitText.text = scoreLimit.ToString();
+        timeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["TIMELIMIT"];
+
+        timeLimitText.text ="Time Limit : " + timeLimit.ToString();
+        scoreLimitText.text = "Score Limit : " + scoreLimit.ToString();
         
         StartCoroutine(Co_timer());
     }

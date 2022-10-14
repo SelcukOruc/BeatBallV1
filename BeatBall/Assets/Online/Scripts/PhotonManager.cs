@@ -29,8 +29,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject redPlayerPrefab;
     [SerializeField] private GameObject ball;
 
-    public List<GameObject> Players = new List<GameObject>();  
-    
+    public List<GameObject> Players,RedTeamPlayers,GreenTeamPlayers = new List<GameObject>();
+    [SerializeField] private PlayerListing playerList;
     void Start()
     {
      
@@ -55,12 +55,19 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public void FindPlayers()
     {
         Players.Clear();
-        
+        RedTeamPlayers.Clear();
+        GreenTeamPlayers.Clear();
+
         foreach (var player in PhotonNetwork.PlayerList)
         {
             GameObject _playerFound = GameObject.Find(player.ActorNumber.ToString());
             Players.Add(_playerFound);
-            
+
+            if (_playerFound.GetComponent<PlayerStat>().IsRedTeamMember)
+                RedTeamPlayers.Add(_playerFound);
+            else
+                GreenTeamPlayers.Add(_playerFound);
+
         }
         
        
@@ -78,6 +85,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public void StartGame()
     {
         base.photonView.RPC("FindPlayers", RpcTarget.All);
+        playerList.OrganizePlayerList();
         MoveToPostions();
         HasGameBegun = true;
     }
@@ -99,6 +107,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
     {
         base.photonView.RPC("FindPlayers", RpcTarget.All);
+        playerList.OrganizePlayerList();
     }
 
 }
