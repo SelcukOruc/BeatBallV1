@@ -25,12 +25,12 @@ public class CreateOrJoinRooms : MonoBehaviourPunCallbacks
     public GameObject playerElement;
     public Transform redLayout, greenLayout;
 
-   
 
+    [SerializeField] CustomizeManager customizeManager;
     public void CreateRoom()
     {
         options.MaxPlayers = 4;
-        options.BroadcastPropsChangeToAll = true;
+        //options.BroadcastPropsChangeToAll = true;
         Hashtable RoomCutomProps = new Hashtable();
         int _timeLimitInput = int.Parse(TimeLimitInputField.text);
         int _scoreLimitInput = int.Parse(ScoreLimitInputField.text);
@@ -40,8 +40,6 @@ public class CreateOrJoinRooms : MonoBehaviourPunCallbacks
 
 
         options.CustomRoomProperties = RoomCutomProps;
-
-
 
 
         PhotonNetwork.LocalPlayer.NickName = NickNameInputField.text;
@@ -63,6 +61,14 @@ public class CreateOrJoinRooms : MonoBehaviourPunCallbacks
 
     }
 
+    private void Start()
+    {
+
+        Hashtable PlayerCustomProp = new Hashtable();
+        PlayerCustomProp.Add("HEADINDEX", 0);
+        PlayerCustomProp.Add("EYEINDEX", 0);
+        PhotonNetwork.LocalPlayer.CustomProperties = PlayerCustomProp;
+    }
 
 }
 

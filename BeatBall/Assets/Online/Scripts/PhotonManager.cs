@@ -31,6 +31,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public List<GameObject> Players,RedTeamPlayers,GreenTeamPlayers = new List<GameObject>();
     [SerializeField] private PlayerListing playerList;
+    
+   
     void Start()
     {
      
@@ -39,7 +41,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             player.transform.GetChild(0).gameObject.SetActive(true);
             player.transform.GetChild(1).gameObject.SetActive(true);
             player.transform.GetChild(2).gameObject.SetActive(true);
-        
+            
+      
        
         
         
@@ -69,8 +72,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks
                 GreenTeamPlayers.Add(_playerFound);
 
         }
-        
-       
+
+        foreach (var player in Players)
+        {
+            player.GetComponent<PlayerPrefences>().SetItems();
+        }
+
     }
     public void MoveToPostions()
     {
