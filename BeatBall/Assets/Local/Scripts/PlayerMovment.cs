@@ -14,7 +14,7 @@ public class PlayerMovment : MonoBehaviourPun
     [SerializeField] private Animator animator;
     Vector3 direction;
     bool isFillingStamina = true;
-   
+    public bool IsGrounded;
     [Header("Hit")]
     
     [SerializeField] private Transform hitPos;
@@ -69,7 +69,8 @@ public class PlayerMovment : MonoBehaviourPun
                 playerListPanel.SetActive(false);
 
         }
-     
+        if (this.hipscj.transform.position.y < -30)
+            this.hipscj.transform.position = Vector3.zero;
     }
 
 
@@ -159,7 +160,7 @@ public class PlayerMovment : MonoBehaviourPun
     public void Jump()
     {
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded)
         {
             myRigidBody.AddForce(0, playerStat.JumpForce * Time.fixedDeltaTime, 0);
         }
@@ -182,6 +183,7 @@ public class PlayerMovment : MonoBehaviourPun
         if (Input.GetMouseButtonUp(0))
         {
             ApplyForceToBall();
+            view.RPC("ApplyForceToPlayer", RpcTarget.AllViaServer);
             isPressedDown = false;
             playerStat.HitForce = 0;
         }
@@ -199,14 +201,42 @@ public class PlayerMovment : MonoBehaviourPun
                 pv_BallController.RPC("RPC_HitBall", RpcTarget.AllViaServer);
 
                 _ball.GetComponent<Rigidbody>().AddForce((mainCam.transform.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight), 0), ForceMode.Impulse);
-
+                Debug.Log("Hey");
             }
 
+            
 
         }
 
 
     }
+    [PunRPC]
+    public void ApplyForceToPlayer()
+    {
+        Collider[] _hitcol = Physics.OverlapSphere(hitPos.position, radius, whomToHit);
+        for (int i = 0; i < _hitcol.Length; i++)
+        {
+            if (_hitcol[i].tag == "player" && _hitcol[i].gameObject != hipscj.gameObject)
+            {
+
+                GameObject _playerhit = _hitcol[i].gameObject;
+
+                _playerhit.GetComponent<Rigidbody>().AddForce((hipscj.transform.forward * 150), ForceMode.VelocityChange);
+                Debug.Log("HÝT" + _hitcol[i].name);
+
+                if(Ball.ins.BallPos != null)
+                {
+                    if (Ball.ins.BallPos.IsChildOf(_playerhit.transform))
+                        pv_BallController.RPC("RPC_HitBall", RpcTarget.AllViaServer);
+                }
+               
+
+                
+            }
+        }
+       
+    }
+
     IEnumerator Co_FillHitForce()
     {
         while (true)
@@ -267,6 +297,14 @@ public class PlayerMovment : MonoBehaviourPun
         
         }
     }
+
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(hitPos.position, radius);
+    }
+
 
 }
 

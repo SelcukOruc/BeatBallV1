@@ -10,6 +10,7 @@ TagManager:
   - redarea
   - greenarea
   - ground
+  - player
   layers:
   - Default
   - TransparentFX

@@ -224,6 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f78721d79190ce84387480d9e5c995d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerMovment: {fileID: 8293420893006695197}
   playerStat: {fileID: 8293420893006695196}
   mainView: {fileID: 8293420893006695186}
 --- !u!1 &1107176297482101716
@@ -1243,7 +1244,7 @@ GameObject:
   - component: {fileID: 3118523625106907481}
   m_Layer: 3
   m_Name: Hips
-  m_TagString: Untagged
+  m_TagString: player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2183,6 +2184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f78721d79190ce84387480d9e5c995d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerMovment: {fileID: 8293420893006695197}
   playerStat: {fileID: 8293420893006695196}
   mainView: {fileID: 8293420893006695186}
 --- !u!1 &4244623077165172506
@@ -5525,7 +5527,7 @@ GameObject:
   - component: {fileID: 1255236030423405568}
   m_Layer: 3
   m_Name: HumanoidPlayer
-  m_TagString: Untagged
+  m_TagString: player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5589,10 +5591,11 @@ MonoBehaviour:
   myRigidBody: {fileID: 3118523625106907484}
   hipscj: {fileID: 3118523625106907487}
   animator: {fileID: 6670945163180296431}
+  IsGrounded: 0
   hitPos: {fileID: 240484349834382733}
   whomToHit:
     serializedVersion: 2
-    m_Bits: 2147483647
+    m_Bits: 328
   pv_BallController: {fileID: 6107843032945664685}
   radius: 1
   ballMaxHeight: 18
