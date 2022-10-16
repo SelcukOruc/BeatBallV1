@@ -33,16 +33,16 @@ public class PlayerMovment : MonoBehaviourPun
 
     public List<GameObject> Limbs = new List<GameObject>();
     public LayerMask GreenTeamLayerMask;
-    GameObject playerListPanel;
+    
 
    
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
 
-        playerListPanel = GameObject.Find("PlayerListing");
+        
         playerStat = GetComponent<PlayerStat>();
         view = GetComponent<PhotonView>();
 
@@ -51,6 +51,11 @@ public class PlayerMovment : MonoBehaviourPun
 
        
     }
+    private void FixedUpdate()
+    {
+        if(view.IsMine)
+            Move();
+    }
 
     private void Update()
     {
@@ -58,15 +63,12 @@ public class PlayerMovment : MonoBehaviourPun
         {
            
             
-                Move();
+               
                 Jump();
                 Hit();
 
             // should be more efficient and decently organized.
-            if (Input.GetKey(KeyCode.Tab))
-                playerListPanel.SetActive(true);
-            else
-                playerListPanel.SetActive(false);
+          
 
         }
         if (this.hipscj.transform.position.y < -30)
@@ -124,7 +126,7 @@ public class PlayerMovment : MonoBehaviourPun
             isFillingStamina = false;
 
             _movedir = _movedir.normalized * playerStat.MoveSpeed * 2.4f * Time.deltaTime;
-            playerStat.Stamina -= 2;
+            playerStat.Stamina -= 20;
 
         }
         else // walk
@@ -221,7 +223,7 @@ public class PlayerMovment : MonoBehaviourPun
 
                 GameObject _playerhit = _hitcol[i].gameObject;
 
-                _playerhit.GetComponent<Rigidbody>().AddForce((hipscj.transform.forward * 150), ForceMode.VelocityChange);
+                _playerhit.GetComponent<Rigidbody>().AddForce((hipscj.transform.forward * 250), ForceMode.VelocityChange);
                 Debug.Log("HÝT" + _hitcol[i].name);
 
                 if(Ball.ins.BallPos != null)
@@ -244,7 +246,7 @@ public class PlayerMovment : MonoBehaviourPun
             if (isPressedDown)
             {
                 playerStat.HitForce = Mathf.Clamp(playerStat.HitForce, 0, playerStat.HitForceLimit);
-                playerStat.HitForce += 4f;
+                playerStat.HitForce += 7f;
 
                 yield return new WaitForSeconds(0.1f);
             }

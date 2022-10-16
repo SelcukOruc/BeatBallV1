@@ -28,7 +28,9 @@ public class PlayerPrefences : MonoBehaviourPun
 
         foreach (var player in PhotonManager.ins.Players)
         {
-            player.GetComponent<PhotonView>().RPC("UpdateItems", RpcTarget.AllBufferedViaServer, player.GetComponent<PlayerPrefences>().HeadItemIndex,player.GetComponent<PlayerPrefences>().EyeItemIndex);
+            player.GetComponent<PhotonView>().RPC("UpdateItems", RpcTarget.AllBufferedViaServer,
+                player.GetComponent<PlayerPrefences>().HeadItemIndex,
+                player.GetComponent<PlayerPrefences>().EyeItemIndex);
         
         }
    
