@@ -23,7 +23,7 @@ public class PlayerMovment : MonoBehaviourPun
     [SerializeField] private float radius;
     public float ballMaxHeight = 18; //6
     bool isPressedDown = false;
-
+    [SerializeField] private AudioSource ballHitSFX,playerHitSFX;
 
 
     [Header("Server")]
@@ -33,9 +33,9 @@ public class PlayerMovment : MonoBehaviourPun
 
     public List<GameObject> Limbs = new List<GameObject>();
     public LayerMask GreenTeamLayerMask;
-    
 
-   
+
+    [SerializeField] private ParticleSystem hitParticle;
 
     private void Start()
     {
@@ -59,21 +59,19 @@ public class PlayerMovment : MonoBehaviourPun
 
     private void Update()
     {
+
         if (view.IsMine)
         {
-           
-            
-               
-                Jump();
-                Hit();
-
-            // should be more efficient and decently organized.
-          
-
+            Jump();
+            Hit();
         }
+
         if (this.hipscj.transform.position.y < -30)
             this.hipscj.transform.position = Vector3.zero;
+
     }
+
+
 
 
     #region Movment
@@ -184,6 +182,10 @@ public class PlayerMovment : MonoBehaviourPun
         }
         if (Input.GetMouseButtonUp(0))
         {
+            animator.SetTrigger("Hit");
+          
+         
+
             ApplyForceToBall();
             view.RPC("ApplyForceToPlayer", RpcTarget.AllViaServer);
             isPressedDown = false;
@@ -203,7 +205,9 @@ public class PlayerMovment : MonoBehaviourPun
                 pv_BallController.RPC("RPC_HitBall", RpcTarget.AllViaServer);
 
                 _ball.GetComponent<Rigidbody>().AddForce((mainCam.transform.forward * playerStat.HitForce) + new Vector3(0, Mathf.Clamp(ballMaxHeight - mainCam.transform.position.y, 0, ballMaxHeight), 0), ForceMode.Impulse);
-                Debug.Log("Hey");
+                hitParticle.Play();
+                ballHitSFX.Play();
+            
             }
 
             
@@ -222,22 +226,26 @@ public class PlayerMovment : MonoBehaviourPun
             {
 
                 GameObject _playerhit = _hitcol[i].gameObject;
-
                 _playerhit.GetComponent<Rigidbody>().AddForce((hipscj.transform.forward * 250), ForceMode.VelocityChange);
-                Debug.Log("HÝT" + _hitcol[i].name);
-
-                if(Ball.ins.BallPos != null)
+                playerHitSFX.Play();
+                hitParticle.Play();
+                if (Ball.ins.BallPos != null)
                 {
                     if (Ball.ins.BallPos.IsChildOf(_playerhit.transform))
                         pv_BallController.RPC("RPC_HitBall", RpcTarget.AllViaServer);
                 }
                
 
-                
             }
+
         }
-       
+    
     }
+
+
+
+
+
 
     IEnumerator Co_FillHitForce()
     {

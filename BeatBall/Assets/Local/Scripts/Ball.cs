@@ -34,7 +34,9 @@ public class Ball : MonoBehaviourPun, IPunOwnershipCallbacks
             float y = Mathf.Clamp(BallPos.position.y, 0.5f, BallPos.position.y);
             transform.position = new Vector3(BallPos.position.x, y , BallPos.position.z);
         }
-           
+
+        if (transform.position.y < -30)
+            transform.position = Vector3.zero;
     }
 
     public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)

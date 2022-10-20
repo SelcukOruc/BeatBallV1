@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
+using UnityEngine.UI;
+
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager ins { get; private set; }
@@ -31,7 +33,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public Vector3 RedTeamPos, GreenTeamPos,StartPos;
     public Vector3 BallInsPos;
-
+    
+    [SerializeField] private GameObject finishPanel;
+    [SerializeField] private AudioSource finishSFX,scoreSFX;
     private void Start()
     {
         scoreLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["SCORELIMIT"];
@@ -75,6 +79,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void OnScored()
     {
+        scoreSFX.Play();
         SetScoreText();
         OnReachedScoreLimit();
         foreach (var player in PhotonManager.ins.Players)
@@ -108,30 +113,40 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             PhotonManager.ins.HasGameBegun = false;
 
+            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = true;
 
-            Debug.Log("Game finished.");
+            finishPanel.SetActive(true);
+            TextMeshProUGUI _panelText = finishPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
             
-                if (_greenScore > _redScore)
-                {
-                    Debug.Log("Green Team Won");
+            finishSFX.Play();
 
-                }
-                if (_redScore > _greenScore)
-                {
-                    Debug.Log("Red Team Won");
-                }
-                if (_redScore == _greenScore)
-                {
-                    Debug.Log("Teams Are Equal.");
+            if (_greenScore > _redScore)
+            {
+                 _panelText.text = "Green Team Won !";
+                 _panelText.color = Color.green;
 
-                }
+            }
+            if (_redScore > _greenScore)
+            {
+                _panelText.text = "Red Team Won !";
+                _panelText.color = Color.red;
+            }
+            if (_redScore == _greenScore)
+            {
+                _panelText.text = "Teams Are Equal !";
+                _panelText.color = Color.gray;
+
+            }
+
+
 
 
             //foreach (var player in PhotonManager.ins.Players)
             //{
             //    player.SetActive(false);
             //}
-           
+
 
         }
        

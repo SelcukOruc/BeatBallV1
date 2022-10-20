@@ -2,12 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.UI;
+
 public class BallController : MonoBehaviour
 {
     public Transform m_BallPos;
     Collider m_Collider;
     PhotonView m_View;
     public bool HasLostBall = false;
+
+    [SerializeField] private Image ballIndicator;
     private void Start()
     {
         m_Collider = GetComponent<Collider>();
@@ -34,7 +38,7 @@ public class BallController : MonoBehaviour
        
         Ball.ins.BallPos = m_BallPos;
         m_Collider.enabled = false;
-    
+        ballIndicator.color = Color.red;
 
 
 
@@ -65,7 +69,7 @@ public class BallController : MonoBehaviour
                 yield return new WaitForSeconds(2);
                
                 m_View.RPC("ActivateCollider", RpcTarget.AllViaServer);
-               
+                ballIndicator.color = Color.green;
             }
 
             yield return null;
