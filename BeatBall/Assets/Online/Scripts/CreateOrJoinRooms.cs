@@ -29,7 +29,7 @@ public class CreateOrJoinRooms : MonoBehaviourPunCallbacks
     [SerializeField] CustomizeManager customizeManager;
     public void CreateRoom()
     {
-        options.MaxPlayers = 4;
+        
         //options.BroadcastPropsChangeToAll = true;
         Hashtable RoomCutomProps = new Hashtable();
         int _timeLimitInput = int.Parse(TimeLimitInputField.text);

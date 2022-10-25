@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         int _redScore = RedTeamScore;
         int _greenScore = GreenTeamScore;
 
-        if ( _totalScore == _scoreLimit || minute == (int)PhotonNetwork.CurrentRoom.CustomProperties["TIMELIMIT"])
+        if ( _redScore == _scoreLimit || _greenScore == _scoreLimit || minute == (int)PhotonNetwork.CurrentRoom.CustomProperties["TIMELIMIT"])
         {
             PhotonManager.ins.HasGameBegun = false;
 

@@ -25,6 +25,7 @@ public class BallController : MonoBehaviour
         {
             // Make it appear on network.
             m_View.RPC("RPC_GetBall", RpcTarget.AllViaServer);
+            
         }        
     
     
